@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.oberon-oss</groupId>
+        <artifactId>project-settings-parent</artifactId>
+        <version>4.25.5</version>
+    </parent>
+
+    <groupId>eu.oberon-oss.tsc</groupId>
+    <artifactId>tsc-content-manager</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>tsc-content-manager</name>
+    <description>A content manager for various file types and data in the Train Simulator Classic (TSC) application</description>
+
+    <modules>
+        <module>01-tsc-cm-base</module>
+        <module>90-tsc-cm-cli</module>
+        <module>95-tsc-cm-app</module>
+        <module>99-tsc-cm-jacoco</module>
+    </modules>
+
+    <properties>
+        <!--suppress XmlUnresolvedReference -->
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml,${project.build.directory}/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.projectKey>oberon-oss_tsc-content-manager</sonar.projectKey>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>01-tsc-cm-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>90-tsc-cm-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>95-tsc-cm-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>99-tsc-cm-jacoco</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/oberon-oss/tsc-content-manager.git</connection>
+        <developerConnection>scm:git@github.com:oberon-oss/tsc-content-manager.git</developerConnection>
+        <url>https://github.com/oberon-oss/tsc-content-manager</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>TigerLilly64</id>
+            <name>TigerLilly64</name>
+            <email>info@oberon-oss.eu</email>
+            <organization>Oberon Open Source Software (OSS)</organization>
+            <organizationUrl>https://github.com/oberon-oss</organizationUrl>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>https://nexus.oberon-oss.eu/repository/maven-releases/</url>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>https://nexus.oberon-oss.eu/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>

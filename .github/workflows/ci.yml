@@ -1,0 +1,36 @@
+name: CI/CD Pipeline
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    release:
+        types: [ published ]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    packages: write
+    id-token: write
+    pages: write
+
+jobs:
+    pipeline:
+        uses: oberon-oss/github-workflows/.github/workflows/maven-pipeline.yml@9a0853a35df179d8f0e26621f03cfe568403a8b3
+        with:
+            java-version: '25'
+            profiles: 'lombok,jacoco'
+            deploy-profiles: 'lombok,deploy-to-nexus'
+        secrets:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            # Oberon OSS nexus credentials
+            NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+            NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+            # Maven Central credentials
+            CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+            CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+            GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
