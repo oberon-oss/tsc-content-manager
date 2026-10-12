@@ -19,11 +19,12 @@ permissions:
 
 jobs:
     pipeline:
-        uses: oberon-oss/github-workflows/.github/workflows/maven-pipeline.yml@9a0853a35df179d8f0e26621f03cfe568403a8b3
+        uses: oberon-oss/github-workflows/.github/workflows/maven-pipeline.yml@931ebb1b682e479b5887cbd63be3077e541d2fde
         with:
             java-version: '25'
             profiles: 'lombok,jacoco'
             deploy-profiles: 'lombok,deploy-to-nexus'
+            jacoco-report-path: '**/target/site/jacoco-aggregate/jacoco.xml'
         secrets:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             # Oberon OSS nexus credentials
