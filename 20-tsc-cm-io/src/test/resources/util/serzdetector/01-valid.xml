@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+	<Blueprint>
+		<cConsistBlueprint>
+			<ConsistEntry>
+				<cConsistEntry d:id="215978">
+					<BlueprintName>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString">virtualRailroads</Provider>
+									<Product d:type="cDeltaString">vR_BR189_VRot_EL</Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString">Elloks\BR189\BR189_VRot_011.xml</BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</BlueprintName>
+					<Flipped d:type="cDeltaString">eFalse</Flipped>
+				</cConsistEntry>
+			</ConsistEntry>
+			<LocoName>
+				<Localisation-cUserLocalisedString>
+					<English d:type="cDeltaString">vR BR189 Expert-Line</English>
+					<French d:type="cDeltaString">vR BR189 Expert-Line</French>
+					<Italian d:type="cDeltaString">vR BR189 Expert-Line</Italian>
+					<German d:type="cDeltaString">vR BR189 Expert-Line</German>
+					<Spanish d:type="cDeltaString">vR BR189 Expert-Line</Spanish>
+					<Dutch d:type="cDeltaString">vR BR189 Expert-Line</Dutch>
+					<Polish d:type="cDeltaString">vR BR189 Expert-Line</Polish>
+					<Russian d:type="cDeltaString">vR BR189 Expert-Line</Russian>
+					<Other/>
+					<Key d:type="cDeltaString"></Key>
+				</Localisation-cUserLocalisedString>
+			</LocoName>
+			<DisplayName>
+				<Localisation-cUserLocalisedString>
+					<English d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</English>
+					<French d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</French>
+					<Italian d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</Italian>
+					<German d:type="cDeltaString">vR BR189 Expert-Line 011 Verkehrsrot Tfz</German>
+					<Spanish d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</Spanish>
+					<Dutch d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</Dutch>
+					<Polish d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</Polish>
+					<Russian d:type="cDeltaString">vR BR189 Expert-Line 011 traffic red light engine</Russian>
+					<Other/>
+					<Key d:type="cDeltaString"></Key>
+				</Localisation-cUserLocalisedString>
+			</DisplayName>
+			<EngineType d:type="cDeltaString">Electric</EngineType>
+			<EraStartYear d:type="sUInt32">2000</EraStartYear>
+			<EraEndYear d:type="sUInt32">2050</EraEndYear>
+			<DrivingEngineIndex d:type="sUInt32">0</DrivingEngineIndex>
+			<ValidBuildAndDriveRoutes/>
+			<DrivableConsist d:type="cDeltaString">eTrue</DrivableConsist>
+			<ConsistType d:type="cDeltaString">eConsistTypeCustom1</ConsistType>
+			<HasPantograph d:type="cDeltaString">eTrue</HasPantograph>
+			<Has3rdRailShoe d:type="cDeltaString">eFalse</Has3rdRailShoe>
+			<Requires4thRail d:type="cDeltaString">eFalse</Requires4thRail>
+		</cConsistBlueprint>
+	</Blueprint>
+</cBlueprintLoader>

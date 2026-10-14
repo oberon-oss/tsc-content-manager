@@ -19,6 +19,7 @@
 
     <modules>
         <module>01-tsc-cm-base</module>
+        <module>20-tsc-cm-io</module>
         <module>90-tsc-cm-cli</module>
         <module>95-tsc-cm-app</module>
         <module>99-tsc-cm-jacoco</module>
@@ -32,9 +33,21 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- external dependencies -->
+            <dependency>
+                <groupId>eu.oberon-oss.tools</groupId>
+                <artifactId>data-converters</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <!-- Project dependencies -->
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>
                 <artifactId>01-tsc-cm-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>20-tsc-cm-io</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
