@@ -24,7 +24,7 @@ jobs:
             java-version: '25'
             profiles: 'lombok,jacoco'
             deploy-profiles: 'lombok,deploy-to-nexus'
-            jacoco-report-path: '**/target/site/jacoco-aggregate/jacoco.xml'
+            jacoco-report-path: '99-tsc-cm-jacoco/target/site/jacoco-aggregate/jacoco.xml'
         secrets:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             # Oberon OSS nexus credentials
