@@ -28,9 +28,11 @@
     <properties>
         <!--suppress XmlUnresolvedReference -->
         <sonar.coverage.jacoco.xmlReportPaths>
+            ${maven.multiModuleProjectDirectory}/target/site/jacoco/jacoco.xml,
+            ${maven.multiModuleProjectDirectory}/target/site/jacoco/jacoco-aggregate/jacoco.xml,
+            ${maven.multiModuleProjectDirectory}/99-tsc-cm-jacoco/target/site/jacoco-aggregate/jacoco.xml,
             ${project.build.directory}/site/jacoco/jacoco.xml,
-            ${project.build.directory}/site/jacoco-aggregate/jacoco.xml,
-            ${maven.multiModuleProjectDirectory}/99-tsc-cm-jacoco/target/site/jacoco-aggregate/jacoco.xml
+            ${project.build.directory}/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.projectKey>oberon-oss_tsc-content-manager</sonar.projectKey>
     </properties>
