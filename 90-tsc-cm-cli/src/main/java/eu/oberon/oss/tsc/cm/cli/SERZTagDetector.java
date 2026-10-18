@@ -97,6 +97,7 @@ public class SERZTagDetector implements Callable<Integer> {
      *
      * @since 1.0.0
      */
+    @SuppressWarnings("StringConcatenationArgumentToLogCall")
     @Override
     public Integer call() {
         long start = System.currentTimeMillis();
@@ -129,10 +130,10 @@ public class SERZTagDetector implements Callable<Integer> {
                 if (viewer.peekByte(reader.offset()) == MARKER_BYTE) {
                     viewer.peekBytes(section, reader.offset());
                     if (targetBytes.contains(section[1]) && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], k -> new LongAdder()).increment();
+                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
                         reader.offset(reader.offset() + 4);
                     } else if (includeClosingTag && section[1] == CLOSING_TAG_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], k -> new LongAdder()).increment();
+                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
                         reader.offset(reader.offset() + 2);
                     }
                 }
