@@ -27,8 +27,12 @@ class SerzFileTypeDetectorTest {
     @ParameterizedTest
     @MethodSource
     void testSerzFileTypeDetectorForValidFiles(Path path, String expectedContentType) {
-        String contentType = assertDoesNotThrow(() -> Files.probeContentType(path));
-        assertEquals(expectedContentType, contentType);
+        SerzFileTypeDetector detector = new SerzFileTypeDetector();
+        String detectorContentType = assertDoesNotThrow(() -> detector.probeContentType(path));
+        assertEquals(expectedContentType, detectorContentType);
+
+        String filesContentType = assertDoesNotThrow(() -> Files.probeContentType(path));
+        assertEquals(expectedContentType, filesContentType);
     }
 
     @ParameterizedTest
@@ -70,6 +74,18 @@ class SerzFileTypeDetectorTest {
                 Arguments.of(
                         SerzFileTypeDetector.XML_HEADER + "  " + SerzFileTypeDetector.DELTA_LOADER_HEADER,
                         SerzFileTypeDetector.SERZ_XML_CONTENT_TYPE
+                ),
+                Arguments.of(
+                        SerzFileTypeDetector.XML_HEADER + "\n<!-- comment -->\n" + SerzFileTypeDetector.BLUEPRINT_LOADER_HEADER,
+                        SerzFileTypeDetector.SERZ_XML_CONTENT_TYPE
+                ),
+                Arguments.of(
+                        SerzFileTypeDetector.XML_HEADER + "\r\n<!-- comment 1 -->\r\n<!-- comment 2 -->\r\n" + SerzFileTypeDetector.DELTA_LOADER_HEADER,
+                        SerzFileTypeDetector.SERZ_XML_CONTENT_TYPE
+                ),
+                Arguments.of(
+                        SerzFileTypeDetector.XML_HEADER + "\n<!-- unclosed comment\n" + SerzFileTypeDetector.BLUEPRINT_LOADER_HEADER,
+                        null
                 ),
                 Arguments.of(
                         "\uFEFF" + SerzFileTypeDetector.XML_HEADER + "\n" + SerzFileTypeDetector.BLUEPRINT_LOADER_HEADER,

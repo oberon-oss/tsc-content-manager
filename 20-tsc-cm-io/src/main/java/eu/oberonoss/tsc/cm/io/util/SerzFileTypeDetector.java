@@ -22,15 +22,33 @@ import java.util.Arrays;
  * @author TigerLilly64
  * @since v1.0.0
  */
+@SuppressWarnings("HttpUrlsUsage")
 public class SerzFileTypeDetector extends FileTypeDetector {
+    /// Identifies the SERZ binary file format.
     public static final String SERZ_BINARY_CONTENT_TYPE = "application/x-serz";
+
+    /// Identifies the SERZ XML file format.
     public static final String SERZ_XML_CONTENT_TYPE = "application/x-serz+xml";
 
+    /// The first line of an XML SERZ file.
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+
+    /// Line stating the structure name as `<cBlueprintLoader>`.
     public static final String BLUEPRINT_LOADER_HEADER = "<cBlueprintLoader xmlns:d=\"http://www.kuju.com/TnT/2003/Delta\" d:version=\"1.0\">";
+
+    /// Line stating the structure name as `<cDeltaLoader>`.
     public static final String DELTA_LOADER_HEADER = "<cDeltaLoader xmlns:d=\"http://www.kuju.com/TnT/2003/Delta\" d:version=\"1.0\">";
 
     private static final byte[] SERZ_ID_SIGNATURE = new byte[]{0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
+
+    /**
+     * Default constructor.
+     *
+     * @since 1.0.0
+     */
+    public SerzFileTypeDetector() {
+        // Keep Javadoc happy
+    }
 
     @Override
     public String probeContentType(Path path) throws IOException {
@@ -96,6 +114,13 @@ public class SerzFileTypeDetector extends FileTypeDetector {
         }
 
         String remainder = header.substring(XML_HEADER.length()).stripLeading();
+        while (remainder.startsWith("<!--")) {
+            int commentEnd = remainder.indexOf("-->");
+            if (commentEnd == -1) {
+                return false;
+            }
+            remainder = remainder.substring(commentEnd + 3).stripLeading();
+        }
         return remainder.startsWith(BLUEPRINT_LOADER_HEADER) || remainder.startsWith(DELTA_LOADER_HEADER);
     }
 }

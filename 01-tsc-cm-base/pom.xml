@@ -13,4 +13,10 @@
 
     <name>01-tsc-cm-base</name>
     <description>Base module for tsc-content-manager</description>
+    <dependencies>
+        <dependency>
+            <groupId>eu.oberon-oss.tools</groupId>
+            <artifactId>data-converters</artifactId>
+        </dependency>
+    </dependencies>
 </project>
