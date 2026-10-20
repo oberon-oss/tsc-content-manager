@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>99-tsc-cm-jacoco</artifactId>
+    <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
     <description>JaCoCo Code Coverage Report module for tsc-content-manager</description>
