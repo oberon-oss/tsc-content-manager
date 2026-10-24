@@ -15,7 +15,7 @@ class SERZTagDetectorTest {
         SERZTagDetector detector = new SERZTagDetector();
         Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-d", testDir.toString(), "--include-closing-tag=true");
+        int exitCode = cmd.execute("-f", testDir.toString(), "--include-closing-tag=true");
         assertEquals(0, exitCode);
     }
 
@@ -24,7 +24,7 @@ class SERZTagDetectorTest {
         SERZTagDetector detector = new SERZTagDetector();
         Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-d", testDir.toString(), "--include-closing-tag=false");
+        int exitCode = cmd.execute("-f", testDir.toString(), "--include-closing-tag=false");
         assertEquals(0, exitCode);
     }
 
@@ -33,7 +33,7 @@ class SERZTagDetectorTest {
         SERZTagDetector detector = new SERZTagDetector();
         Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-d", testDir.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
+        int exitCode = cmd.execute("-f", testDir.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
         assertEquals(0, exitCode);
     }
 
@@ -41,7 +41,7 @@ class SERZTagDetectorTest {
     void testExecutionWithEmptyDirectory(@org.junit.jupiter.api.io.TempDir Path tempDir) {
         SERZTagDetector detector = new SERZTagDetector();
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-d", tempDir.toString());
+        int exitCode = cmd.execute("-f", tempDir.toString());
         assertEquals(0, exitCode);
     }
 

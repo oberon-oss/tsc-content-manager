@@ -9,6 +9,7 @@ import eu.oberonoss.tsc.cm.io.util.FileScanner;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +35,8 @@ import java.util.regex.Pattern;
 public class SERZTagDetector implements Callable<Integer> {
 
     @CommandLine.Option(
-            names = {"--starting-directory", "-d"},
-            description = "Starting directory for scanning",
+            names = {"--file-or-directory", "-f"},
+            description = "Single file or starting directory for scanning",
             required = true
     )
     Path startingDirectory;
@@ -100,6 +101,7 @@ public class SERZTagDetector implements Callable<Integer> {
         long start = System.currentTimeMillis();
         Set<Byte> targetBytes = getIDBytes();
 
+        LOGGER.info("Starting SERZ tag detection process... {}", startingDirectory.toAbsolutePath());
         FileProcessor<BinaryDataReader> processor = new BinaryFileProcessor(reader -> patternScanner(reader, targetBytes));
         FileScanner scanner = FileScanner.of(threadCount);
         scanner.scan(processor, startingDirectory);
