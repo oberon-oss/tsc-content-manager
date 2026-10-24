@@ -27,7 +27,7 @@ class ByteLoaderTest {
 
     @Test
     void testLoadBytesFromInputStream() throws IOException {
-        byte[] expected = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
+        byte[] expected = {1, 2, 3, 4, 5, 6, 7, 8};
         try (InputStream in = new ByteArrayInputStream(expected)) {
             byte[] actual = loader.loadBytes(in);
             assertArrayEquals(expected, actual);
@@ -36,7 +36,7 @@ class ByteLoaderTest {
 
     @Test
     void testLoadBytesFromPath(@TempDir Path tempDir) throws IOException {
-        byte[] expected = new byte[]{10, 20, 30, 40};
+        byte[] expected = {10, 20, 30, 40};
         Path testFile = tempDir.resolve("test.bin");
         Files.write(testFile, expected);
 
@@ -46,7 +46,7 @@ class ByteLoaderTest {
 
     @Test
     void testGetBinaryDataViewerFromPath(@TempDir Path tempDir) throws IOException {
-        byte[] data = new byte[]{0x53, 0x45, 0x52, 0x5A};
+        byte[] data = {0x53, 0x45, 0x52, 0x5A};
         Path testFile = tempDir.resolve("viewer-test.bin");
         Files.write(testFile, data);
 
@@ -58,7 +58,7 @@ class ByteLoaderTest {
 
     @Test
     void testGetBinaryDataReaderFromPath(@TempDir Path tempDir) throws IOException {
-        byte[] data = new byte[]{0x53, 0x45, 0x52, 0x5A};
+        byte[] data = {0x53, 0x45, 0x52, 0x5A};
         Path testFile = tempDir.resolve("reader-test.bin");
         Files.write(testFile, data);
 
@@ -71,7 +71,7 @@ class ByteLoaderTest {
 
     @Test
     void testGetBinaryDataViewerFromInputStream() throws IOException {
-        byte[] data = new byte[]{0x11, 0x22, 0x33};
+        byte[] data = {0x11, 0x22, 0x33};
         try (InputStream in = new ByteArrayInputStream(data)) {
             BinaryDataViewer viewer = loader.getBinaryDataViewer(in);
             assertNotNull(viewer);
@@ -82,7 +82,7 @@ class ByteLoaderTest {
 
     @Test
     void testGetBinaryDataReaderFromInputStream() throws IOException {
-        byte[] data = new byte[]{0x11, 0x22, 0x33};
+        byte[] data = {0x11, 0x22, 0x33};
         try (InputStream in = new ByteArrayInputStream(data)) {
             BinaryDataReader reader = loader.getBinaryDataReader(in);
             assertNotNull(reader);

@@ -24,7 +24,7 @@ class SERZTagTypesTest {
 
     @Test
     void testMatchesFileHeader() {
-        byte[] validHeader = new byte[]{0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
+        byte[] validHeader = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
         BinaryDataReader reader = new BinaryDataReaderImpl(new BinaryDataViewerImpl(validHeader));
 
         assertTrue(SERZTagTypes.FILE_HEADER.matches(reader));
@@ -33,7 +33,7 @@ class SERZTagTypesTest {
 
     @Test
     void testMatchesTypeX50() {
-        byte[] x50 = new byte[]{(byte) 0xFF, 0x50, (byte) 0xFF, (byte) 0xFF};
+        byte[] x50 = {(byte) 0xFF, 0x50, (byte) 0xFF, (byte) 0xFF};
         BinaryDataReader reader = new BinaryDataReaderImpl(new BinaryDataViewerImpl(x50));
 
         assertTrue(SERZTagTypes.TYPE_X50.matches(reader));
@@ -43,7 +43,7 @@ class SERZTagTypesTest {
 
     @Test
     void testMatchesTypeX70() {
-        byte[] x70 = new byte[]{(byte) 0xFF, (byte) 0x70};
+        byte[] x70 = {(byte) 0xFF, (byte) 0x70};
         BinaryDataReader reader = new BinaryDataReaderImpl(new BinaryDataViewerImpl(x70));
 
         assertTrue(SERZTagTypes.TYPE_X70.matches(reader));

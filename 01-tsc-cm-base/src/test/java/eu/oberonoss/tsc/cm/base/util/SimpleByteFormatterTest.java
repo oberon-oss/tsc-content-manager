@@ -70,7 +70,7 @@ class SimpleByteFormatterTest {
 
         @Test
         void formatBytesFormatsSingleFullSixteenByteLine() {
-            byte[] bytes = new byte[]{
+            byte[] bytes = {
                     0x00,
                     0x01,
                     0x02,
@@ -107,7 +107,7 @@ class SimpleByteFormatterTest {
 
         @Test
         void formatBytesReplacesNonPrintableCharactersWithDots() {
-            byte[] bytes = new byte[]{
+            byte[] bytes = {
                     0x1F,
                     0x20,
                     0x41,
@@ -155,7 +155,7 @@ class SimpleByteFormatterTest {
 
         @Test
         void formatBytesAlignsUnalignedCustomStartOffsetToPreviousSixteenByteBoundary() {
-            byte[] bytes = new byte[]{
+            byte[] bytes = {
                     (byte) 0xFF,
                     0x43,
                     0x00,
@@ -185,7 +185,7 @@ class SimpleByteFormatterTest {
 
         @Test
         void formatBytesRejectsNegativeStartOffset() {
-            byte[] bytes = new byte[]{0x01};
+            byte[] bytes = {0x01};
 
             IllegalArgumentException exception = assertThrows(
                     IllegalArgumentException.class,

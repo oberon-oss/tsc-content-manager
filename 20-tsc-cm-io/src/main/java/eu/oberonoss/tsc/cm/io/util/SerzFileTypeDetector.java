@@ -39,7 +39,7 @@ public class SerzFileTypeDetector extends FileTypeDetector {
     /// Line stating the structure name as `<cDeltaLoader>`.
     public static final String DELTA_LOADER_HEADER = "<cDeltaLoader xmlns:d=\"http://www.kuju.com/TnT/2003/Delta\" d:version=\"1.0\">";
 
-    private static final byte[] SERZ_ID_SIGNATURE = new byte[]{0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
+    private static final byte[] SERZ_ID_SIGNATURE = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
 
     /**
      * Default constructor.

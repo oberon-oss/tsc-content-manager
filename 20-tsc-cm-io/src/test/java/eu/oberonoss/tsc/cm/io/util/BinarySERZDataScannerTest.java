@@ -58,7 +58,7 @@ class BinarySERZDataScannerTest {
 
     @Test
     void testStreamWithoutRecognizedTags() throws IOException {
-        byte[] nonTagData = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
+        byte[] nonTagData = {1, 2, 3, 4, 5, 6, 7, 8};
         try (InputStream inputStream = new java.io.ByteArrayInputStream(nonTagData)) {
             List<SERZTagInfo> serzTagInfos = scanner.scanBinarySERZData(inputStream);
             assertNotNull(serzTagInfos);
