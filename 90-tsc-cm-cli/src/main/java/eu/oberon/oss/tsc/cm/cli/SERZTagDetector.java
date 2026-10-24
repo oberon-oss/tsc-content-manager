@@ -9,7 +9,6 @@ import eu.oberonoss.tsc.cm.io.util.FileScanner;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
