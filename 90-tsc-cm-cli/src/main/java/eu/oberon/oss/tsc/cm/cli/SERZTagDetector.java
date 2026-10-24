@@ -3,13 +3,12 @@ package eu.oberon.oss.tsc.cm.cli;
 
 import eu.oberon.oss.tools.binaryreader.BinaryDataReader;
 import eu.oberon.oss.tools.binaryreader.BinaryDataViewer;
-import eu.oberonoss.tsc.cm.base.ByteLoaderImpl;
-import eu.oberonoss.tsc.cm.io.util.BinaryFileScanner;
+import eu.oberonoss.tsc.cm.io.util.BinaryFileProcessor;
+import eu.oberonoss.tsc.cm.io.util.FileProcessor;
+import eu.oberonoss.tsc.cm.io.util.FileScanner;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,10 +100,9 @@ public class SERZTagDetector implements Callable<Integer> {
         long start = System.currentTimeMillis();
         Set<Byte> targetBytes = getIDBytes();
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(threadCount)) {
-            BinaryFileScanner scanner = new BinaryFileScanner(startingDirectory);
-            scanner.scan(file -> executor.submit(() -> patternScanner(file, targetBytes)));
-        }
+        FileProcessor<BinaryDataReader> processor = new BinaryFileProcessor(reader -> patternScanner(reader, targetBytes));
+        FileScanner scanner = FileScanner.of(threadCount);
+        scanner.scan(processor, startingDirectory);
 
         long total = System.currentTimeMillis() - start;
         long seconds = Math.max(1, total / 1000);
@@ -119,34 +115,28 @@ public class SERZTagDetector implements Callable<Integer> {
         return 0;
     }
 
-    private void patternScanner(File file, Set<Byte> targetBytes) {
-        try {
-            LOGGER.trace("Scanning file: {}", file);
-            BinaryDataReader reader = ByteLoaderImpl.getInstance().getBinaryDataReader(file.toPath());
-            BinaryDataViewer viewer = reader.getViewer();
-            byte[] section = new byte[4]; // Local to thread execution
+    private void patternScanner(BinaryDataReader reader, Set<Byte> targetBytes) {
+        BinaryDataViewer viewer = reader.getViewer();
+        byte[] section = new byte[4]; // Local to thread execution
 
-            while (reader.remaining() > 0) {
-                if (viewer.peekByte(reader.offset()) == MARKER_BYTE) {
-                    viewer.peekBytes(section, reader.offset());
-                    if (targetBytes.contains(section[1]) && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        reader.offset(reader.offset() + 4);
-                    } else if (includeClosingTag && section[1] == CLOSING_TAG_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        reader.offset(reader.offset() + 2);
-                    }
+        while (reader.remaining() > 0) {
+            if (viewer.peekByte(reader.offset()) == MARKER_BYTE) {
+                viewer.peekBytes(section, reader.offset());
+                if (targetBytes.contains(section[1]) && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
+                    aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
+                    reader.offset(reader.offset() + 4);
+                } else if (includeClosingTag && section[1] == CLOSING_TAG_BYTE) {
+                    aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
+                    reader.offset(reader.offset() + 2);
                 }
-                reader.offset(reader.offset() + 1);
             }
+            reader.offset(reader.offset() + 1);
+        }
 
-            processedFiles.increment();
-            long current = processedFiles.sum();
-            if (current % 5000 == 0) {
-                LOGGER.info("Processed {} files", current);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed scanning file: {}", file, e);
+        processedFiles.increment();
+        long current = processedFiles.sum();
+        if (current % 5000 == 0) {
+            LOGGER.info("Processed {} files", current);
         }
     }
 
