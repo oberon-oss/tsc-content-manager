@@ -16,6 +16,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Implementation of the {@link FileScanner} interface.
@@ -52,6 +53,7 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
         if (!Files.exists(fileOrDirectory)) {
             return;
         }
+
         int threads = Math.max(1, threadCount);
         int queueCapacity = threads * 4;
         try (ThreadPoolExecutor executor = new ThreadPoolExecutor(
@@ -61,12 +63,17 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
                 new ArrayBlockingQueue<>(queueCapacity),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         )) {
+            long start = System.currentTimeMillis();
+            final LongAdder entriesFound = new LongAdder();
+            final LongAdder processedFiles = new LongAdder();
             Files.walkFileTree(fileOrDirectory, new SimpleFileVisitor<>() {
                 @Override
                 public @NotNull FileVisitResult visitFile(@NotNull Path path, @NotNull BasicFileAttributes attrs) {
                     File file = path.toFile();
+                    entriesFound.increment();
                     if (processor.getFileFilter() == null || processor.getFileFilter().accept(file)) {
                         executor.execute(() -> {
+                            processedFiles.increment();
                             try {
                                 T data = loadData(processor, path);
                                 if (data != null) {
@@ -85,6 +92,11 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
                     return FileVisitResult.CONTINUE;
                 }
             });
+            long total = System.currentTimeMillis() - start;
+            long seconds = Math.max(1, total / 1000);
+            long files = processedFiles.sum();
+            long entries = entriesFound.sum();
+            LOGGER.info("Processing completed. Found {} entries; processed {} files in {} ms (avg: {} files/s)", entries, files, total, files / seconds);
         } catch (IOException e) {
             throw new RuntimeException("Error scanning path: " + fileOrDirectory, e);
         }

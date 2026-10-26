@@ -97,7 +97,6 @@ public class SERZTagDetector implements Callable<Integer> {
     @SuppressWarnings("StringConcatenationArgumentToLogCall")
     @Override
     public Integer call() {
-        long start = System.currentTimeMillis();
         Set<Byte> targetBytes = getIDBytes();
 
         LOGGER.info("Starting SERZ tag detection process... {}", startingDirectory.toAbsolutePath());
@@ -105,11 +104,6 @@ public class SERZTagDetector implements Callable<Integer> {
         FileScanner scanner = FileScanner.of(threadCount);
         scanner.scan(processor, startingDirectory);
 
-        long total = System.currentTimeMillis() - start;
-        long seconds = Math.max(1, total / 1000);
-        long count = processedFiles.sum();
-
-        LOGGER.info("Processing completed. Processed {} files in {} ms (avg: {} files/s)", count, total, count / seconds);
         for (Map.Entry<Byte, LongAdder> entry : aggregatedCounts.entrySet()) {
             LOGGER.info(String.format("Found %,15d occurrences of tag with ID 0x%02X", entry.getValue().sum(), entry.getKey()));
         }
