@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.oberon-oss</groupId>
         <artifactId>project-settings-parent</artifactId>
-        <version>4.25.5</version>
+        <version>4.25.6</version>
     </parent>
 
     <groupId>eu.oberon-oss.tsc</groupId>
@@ -26,6 +26,7 @@
     </modules>
 
     <properties>
+        <oshi-core.version>6.2.0</oshi-core.version>
         <!--suppress XmlUnresolvedReference -->
         <sonar.coverage.jacoco.xmlReportPaths>
             ${maven.multiModuleProjectDirectory}/target/site/jacoco/jacoco.xml,
@@ -57,7 +58,12 @@
             <dependency>
                 <groupId>eu.oberon-oss.tools</groupId>
                 <artifactId>data-converters</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi-core.version}</version>
             </dependency>
             <!-- Project dependencies -->
             <dependency>

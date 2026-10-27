@@ -14,12 +14,15 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Implementation of the {@link FileScanner} interface.
+ *
+ * @param threadCount The number of threads to use.
  *
  * @author TigerLilly64
  * @since 1.0.0
@@ -66,32 +69,9 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
             long start = System.currentTimeMillis();
             final LongAdder entriesFound = new LongAdder();
             final LongAdder processedFiles = new LongAdder();
-            Files.walkFileTree(fileOrDirectory, new SimpleFileVisitor<>() {
-                @Override
-                public @NotNull FileVisitResult visitFile(@NotNull Path path, @NotNull BasicFileAttributes attrs) {
-                    File file = path.toFile();
-                    entriesFound.increment();
-                    if (processor.getFileFilter() == null || processor.getFileFilter().accept(file)) {
-                        executor.execute(() -> {
-                            processedFiles.increment();
-                            try {
-                                T data = loadData(processor, path);
-                                if (data != null) {
-                                    processor.consumer().accept(data);
-                                }
-                            } catch (Exception e) {
-                                LOGGER.error("Error processing file {}: {}", path, e.getMessage(), e);
-                            }
-                        });
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
 
-                @Override
-                public @NotNull FileVisitResult visitFileFailed(@NotNull Path file, @NotNull IOException exc) {
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+            walkTheFileTree(executor, fileOrDirectory, processor, entriesFound, processedFiles);
+
             long total = System.currentTimeMillis() - start;
             long seconds = Math.max(1, total / 1000);
             long files = processedFiles.sum();
@@ -100,6 +80,39 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
         } catch (IOException e) {
             throw new RuntimeException("Error scanning path: " + fileOrDirectory, e);
         }
+    }
+
+    private <T> void walkTheFileTree(ExecutorService executor, Path fileOrDirectory, FileProcessor<T> processor, LongAdder entriesFound, LongAdder processedFiles) throws IOException {
+        Files.walkFileTree(fileOrDirectory, new SimpleFileVisitor<>() {
+            @Override
+            public @NotNull FileVisitResult visitFile(@NotNull Path path, @NotNull BasicFileAttributes attrs) {
+                File file = path.toFile();
+                entriesFound.increment();
+                if (processor.getFileFilter() == null || processor.getFileFilter().accept(file)) {
+                    executor.execute(() -> {
+                        processedFiles.increment();
+                        long current = processedFiles.sum();
+                        if (current % 5000 == 0) {
+                            LOGGER.info("Processed {} files", current);
+                        }
+                        try {
+                            T data = loadData(processor, path);
+                            if (data != null) {
+                                processor.consumer().accept(data);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Error processing file {}: {}", path, e.getMessage(), e);
+                        }
+                    });
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public @NotNull FileVisitResult visitFileFailed(@NotNull Path file, @NotNull IOException exc) {
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     @Override

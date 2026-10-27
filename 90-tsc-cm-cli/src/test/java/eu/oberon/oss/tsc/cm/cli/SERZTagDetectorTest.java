@@ -1,44 +1,41 @@
 package eu.oberon.oss.tsc.cm.cli;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SERZTagDetectorTest {
 
-    @Test
-    void testExecutionWithClosingTag() {
-        SERZTagDetector detector = new SERZTagDetector();
-        Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
-        CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", testDir.toString(), "--include-closing-tag=true");
-        assertEquals(0, exitCode);
-    }
+    private static final Path TEST_DIR = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
 
-    @Test
-    void testExecutionWithoutClosingTag() {
+    @ParameterizedTest
+    @ValueSource(strings = {"--include-closing-tag=true", "--include-closing-tag=false"})
+    void testExecutionWithClosingTagOption(String closingTagOption) {
         SERZTagDetector detector = new SERZTagDetector();
-        Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", testDir.toString(), "--include-closing-tag=false");
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), closingTagOption);
         assertEquals(0, exitCode);
     }
 
     @Test
     void testExecutionWithCustomOptions() {
         SERZTagDetector detector = new SERZTagDetector();
-        Path testDir = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", testDir.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
         assertEquals(0, exitCode);
     }
 
     @Test
-    void testExecutionWithEmptyDirectory(@org.junit.jupiter.api.io.TempDir Path tempDir) {
+    void testExecutionWithEmptyDirectory(@TempDir Path tempDir) {
         SERZTagDetector detector = new SERZTagDetector();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", tempDir.toString());
@@ -50,6 +47,48 @@ class SERZTagDetectorTest {
         SERZTagDetector detector = new SERZTagDetector();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute();
-        org.junit.jupiter.api.Assertions.assertNotEquals(0, exitCode);
+        assertNotEquals(0, exitCode);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-u", "--unknown-tags"})
+    void testExecutionWithUnknownTagsOption(String unknownTagsOption) {
+        SERZTagDetector detector = new SERZTagDetector();
+        CommandLine cmd = new CommandLine(detector);
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), unknownTagsOption);
+        assertEquals(0, exitCode);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "-i, 0x50, -u",
+            "--id-bytes, 0x50, --unknown-tags"
+    })
+    void testExecutionWithMutuallyExclusiveOptions(String idOption, String idValue, String unknownTagOption) {
+        SERZTagDetector detector = new SERZTagDetector();
+        CommandLine cmd = new CommandLine(detector);
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), idOption, idValue, unknownTagOption);
+        assertNotEquals(0, exitCode);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0xFF, 0x50, 0x56, 0x41, 0x42, 0x43})
+    void testUnknownTagsExcludesDefaultAndSpecialIds(int id) {
+        SERZTagDetector detector = new SERZTagDetector();
+        CommandLine cmd = new CommandLine(detector);
+        cmd.parseArgs("-f", "dummy", "-u");
+        Set<Byte> idBytes = detector.getIDBytes();
+
+        assertFalse(idBytes.contains((byte) id), () -> String.format("0x%02X should be excluded from unknown tags", id));
+    }
+
+    @Test
+    void testUnknownTagsTotalCount() {
+        SERZTagDetector detector = new SERZTagDetector();
+        CommandLine cmd = new CommandLine(detector);
+        cmd.parseArgs("-f", "dummy", "-u");
+        Set<Byte> idBytes = detector.getIDBytes();
+
+        assertEquals(256 - 5 - 1, idBytes.size());
     }
 }

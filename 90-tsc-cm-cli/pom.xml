@@ -17,7 +17,6 @@
             <artifactId>picocli</artifactId>
             <version>4.7.7</version>
         </dependency>
-
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>01-tsc-cm-base</artifactId>

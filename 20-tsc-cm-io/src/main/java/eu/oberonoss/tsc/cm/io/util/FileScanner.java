@@ -3,6 +3,8 @@ package eu.oberonoss.tsc.cm.io.util;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static eu.oberonoss.tsc.cm.base.util.HardwareDetails.HardwareDetailItem.CPU_CORE_COUNT;
+
 /**
  * An interface describing the contract for scanning a directory or file.
  * <p>
@@ -13,7 +15,14 @@ import java.nio.file.Path;
  */
 public interface FileScanner {
 
-    int DEFAULT_THREAD_COUNT = 4;
+    /**
+     * The default number of threads that will be used for scanning operations in the {@code FileScanner} class when no specific thread count is provided.
+     * <p>
+     * The value is determined dynamically based on system CPU core information.
+     *
+     * @since 1.0.0
+     */
+    int DEFAULT_THREAD_COUNT = CPU_CORE_COUNT.getInfo();
 
     /**
      * Scans the directory for files matching the processor, loads each file's data, and passes it to the provided consumer using the scanner's configured

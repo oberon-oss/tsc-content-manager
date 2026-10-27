@@ -40,13 +40,23 @@ public class SERZTagDetector implements Callable<Integer> {
     )
     Path startingDirectory;
 
-    @CommandLine.Option(
-            names = {"--id-bytes", "-i"},
-            description = "Specify the 2nd byte in signature to include",
-            defaultValue = "0x50,0x56,0x41,0x42,0x43",
-            split = ","
-    )
-    List<String> idBytes;
+    @CommandLine.ArgGroup()
+    TagOptions tagOptions = new TagOptions();
+
+    static class TagOptions {
+        @CommandLine.Option(
+                names = {"--id-bytes", "-i"},
+                description = "Specify the 2nd byte in signature to include",
+                split = ","
+        )
+        List<String> idBytes;
+
+        @CommandLine.Option(
+                names = {"--unknown-tags", "-u"},
+                description = "Detect unknown SERZ tags"
+        )
+        boolean unknownTags;
+    }
 
     @CommandLine.Option(
             names = {"--threads", "-t"},
@@ -66,7 +76,6 @@ public class SERZTagDetector implements Callable<Integer> {
     private static final byte CLOSING_TAG_BYTE = (byte) 0x70;
 
     private final ConcurrentHashMap<Byte, LongAdder> aggregatedCounts = new ConcurrentHashMap<>();
-    private final LongAdder processedFiles = new LongAdder();
 
 
     /**
@@ -127,23 +136,37 @@ public class SERZTagDetector implements Callable<Integer> {
             }
             reader.offset(reader.offset() + 1);
         }
-
-        processedFiles.increment();
-        long current = processedFiles.sum();
-        if (current % 5000 == 0) {
-            LOGGER.info("Processed {} files", current);
-        }
     }
 
+    private static final List<String> DEFAULT_ID_BYTES = List.of("0x50", "0x56", "0x41", "0x42", "0x43");
     private static final Pattern PATTERN = Pattern.compile("0x([0-9A-F]{2})", Pattern.CASE_INSENSITIVE);
 
-    private Set<Byte> getIDBytes() {
+    Set<Byte> getIDBytes() {
+        if (tagOptions != null && tagOptions.unknownTags) {
+            Set<Byte> known = parseIdBytes(DEFAULT_ID_BYTES);
+            Set<Byte> unknown = new HashSet<>();
+            for (int b = Byte.MIN_VALUE; b <= Byte.MAX_VALUE; b++) {
+                byte val = (byte) b;
+                if (!known.contains(val) && val != MARKER_BYTE) {
+                    unknown.add(val);
+                }
+            }
+            return unknown;
+        }
+
+        List<String> sourceBytes = (tagOptions != null && tagOptions.idBytes != null)
+                ? tagOptions.idBytes
+                : DEFAULT_ID_BYTES;
+        return parseIdBytes(sourceBytes);
+    }
+
+    private Set<Byte> parseIdBytes(List<String> source) {
         Set<Byte> temp = new HashSet<>();
-        if (idBytes != null) {
-            for (String idByte : idBytes) {
+        if (source != null) {
+            for (String idByte : source) {
                 Matcher m = PATTERN.matcher(idByte);
                 if (m.matches()) {
-                    temp.add(Byte.parseByte(m.group(1), 16));
+                    temp.add((byte) Integer.parseInt(m.group(1), 16));
                 }
             }
         }
