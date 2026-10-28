@@ -26,6 +26,7 @@ import static eu.oberonoss.tsc.cm.base.util.HardwareDetails.HardwareDetailItem.C
  * @author TigerLilly64
  * @since 1.0.0
  */
+@SuppressWarnings("unused")
 @Slf4j
 public class SERZTagDetector {
 
