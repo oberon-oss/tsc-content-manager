@@ -6,7 +6,6 @@ import eu.oberonoss.tsc.cm.base.GlobalConstants;
 import eu.oberonoss.tsc.cm.io.util.BinaryFileProcessor;
 import eu.oberonoss.tsc.cm.io.util.FileProcessor;
 import eu.oberonoss.tsc.cm.io.util.FileScanner;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
@@ -28,7 +27,6 @@ import static eu.oberonoss.tsc.cm.base.util.HardwareDetails.HardwareDetailItem.C
  * @since 1.0.0
  */
 @Slf4j
-@Getter
 public class SERZTagDetector {
 
     /**
@@ -203,25 +201,23 @@ public class SERZTagDetector {
         byte[] section = new byte[4]; // Local to thread execution
 
         while (reader.remaining() > 0) {
+            int step = 1;
             if (viewer.peekByte(reader.offset()) == MARKER_BYTE) {
                 if (reader.remaining() >= 4) {
                     viewer.peekBytes(section, reader.offset());
                     if (targetBytes.contains(section[1]) && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
                         aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        reader.offset(reader.offset() + 4);
-                        continue;
+                        step = 4;
                     } else if (includeClosingTag && section[1] == CLOSING_TAG_BYTE) {
                         aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        reader.offset(reader.offset() + 2);
-                        continue;
+                        step = 2;
                     }
                 } else if (includeClosingTag && reader.remaining() >= 2 && viewer.peekByte(reader.offset() + 1) == CLOSING_TAG_BYTE) {
                     aggregatedCounts.computeIfAbsent(CLOSING_TAG_BYTE, _ -> new LongAdder()).increment();
-                    reader.offset(reader.offset() + 2);
-                    continue;
+                    step = 2;
                 }
             }
-            reader.offset(reader.offset() + 1);
+            reader.offset(reader.offset() + step);
         }
     }
 

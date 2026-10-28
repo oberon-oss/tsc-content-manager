@@ -18,29 +18,6 @@ class SERZTagDetectorTest {
 
     private static final Path TEST_DIR = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
 
-    @Test
-    void testDefaultConstructor() {
-        SERZTagDetector detector = new SERZTagDetector();
-        assertEquals(4, detector.getThreadCount());
-        assertTrue(detector.isIncludeClosingTag());
-        assertNotNull(detector.getAggregatedCounts());
-        assertTrue(detector.getAggregatedCounts().isEmpty());
-    }
-
-    @Test
-    void testCustomConstructors() {
-        SERZTagDetector detector1 = new SERZTagDetector(8);
-        assertEquals(8, detector1.getThreadCount());
-        assertTrue(detector1.isIncludeClosingTag());
-
-        SERZTagDetector detector2 = new SERZTagDetector(false);
-        assertEquals(4, detector2.getThreadCount());
-        assertFalse(detector2.isIncludeClosingTag());
-
-        SERZTagDetector detector3 = new SERZTagDetector(2, false);
-        assertEquals(2, detector3.getThreadCount());
-        assertFalse(detector3.isIncludeClosingTag());
-    }
 
     @Test
     void testDetectWithTargetBytes() {
@@ -48,7 +25,6 @@ class SERZTagDetectorTest {
         Map<Byte, LongAdder> counts = detector.detect(TEST_DIR, Set.of((byte) 0x50, (byte) 0x56));
 
         assertNotNull(counts);
-        assertSame(counts, detector.getAggregatedCounts());
         assertFalse(counts.isEmpty());
     }
 
