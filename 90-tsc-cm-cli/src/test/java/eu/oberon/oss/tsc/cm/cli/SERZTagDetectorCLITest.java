@@ -13,14 +13,14 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SERZTagDetectorTest {
+class SERZTagDetectorCLITest {
 
     private static final Path TEST_DIR = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
 
     @ParameterizedTest
     @ValueSource(strings = {"--include-closing-tag=true", "--include-closing-tag=false"})
     void testExecutionWithClosingTagOption(String closingTagOption) {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", TEST_DIR.toString(), closingTagOption);
         assertEquals(0, exitCode);
@@ -28,7 +28,7 @@ class SERZTagDetectorTest {
 
     @Test
     void testExecutionWithCustomOptions() {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", TEST_DIR.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
         assertEquals(0, exitCode);
@@ -36,7 +36,7 @@ class SERZTagDetectorTest {
 
     @Test
     void testExecutionWithEmptyDirectory(@TempDir Path tempDir) {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", tempDir.toString());
         assertEquals(0, exitCode);
@@ -44,7 +44,7 @@ class SERZTagDetectorTest {
 
     @Test
     void testExecutionMissingRequiredOption() {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute();
         assertNotEquals(0, exitCode);
@@ -53,7 +53,7 @@ class SERZTagDetectorTest {
     @ParameterizedTest
     @ValueSource(strings = {"-u", "--unknown-tags"})
     void testExecutionWithUnknownTagsOption(String unknownTagsOption) {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", TEST_DIR.toString(), unknownTagsOption);
         assertEquals(0, exitCode);
@@ -65,7 +65,7 @@ class SERZTagDetectorTest {
             "--id-bytes, 0x50, --unknown-tags"
     })
     void testExecutionWithMutuallyExclusiveOptions(String idOption, String idValue, String unknownTagOption) {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         int exitCode = cmd.execute("-f", TEST_DIR.toString(), idOption, idValue, unknownTagOption);
         assertNotEquals(0, exitCode);
@@ -74,7 +74,7 @@ class SERZTagDetectorTest {
     @ParameterizedTest
     @ValueSource(ints = {0xFF, 0x50, 0x56, 0x41, 0x42, 0x43})
     void testUnknownTagsExcludesDefaultAndSpecialIds(int id) {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         cmd.parseArgs("-f", "dummy", "-u");
         Set<Byte> idBytes = detector.getIDBytes();
@@ -84,7 +84,7 @@ class SERZTagDetectorTest {
 
     @Test
     void testUnknownTagsTotalCount() {
-        SERZTagDetector detector = new SERZTagDetector();
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
         cmd.parseArgs("-f", "dummy", "-u");
         Set<Byte> idBytes = detector.getIDBytes();

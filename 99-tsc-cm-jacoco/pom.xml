@@ -31,6 +31,10 @@
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>70-tsc-cm-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>90-tsc-cm-cli</artifactId>
         </dependency>
         <dependency>
