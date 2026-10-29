@@ -1,5 +1,6 @@
 package eu.oberon.oss.tsc.cm.cli;
 
+import eu.oberonoss.tsc.cm.base.SERZTagTypes;
 import eu.oberonoss.tsc.cm.shared.SERZTagDetector;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
@@ -43,8 +44,8 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
         List<String> idBytes;
 
         @CommandLine.Option(
-                names = {"--unknown-tags", "-u"},
-                description = "Detect unknown SERZ tags"
+                names = {"--tag-patterns", "-u"},
+                description = "Detect (potential) Tag patterns that match 0xFF 0x?? 0xFF 0xFF)"
         )
         boolean unknownTags;
     }
@@ -57,11 +58,11 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
     private int threadCount;
 
     @CommandLine.Option(
-            names = {"--include-closing-tag", "-c"},
-            description = "Include closing tag (0x70) in detection",
-            defaultValue = "true"
+            names = {"--include-known-tags", "-k"},
+            description = "Include all known patterns: 0xFF 0x?? 0xFF 0xFF (41, 42, 43, 50, 56) and 0xFF 0x70",
+            defaultValue = "false"
     )
-    private boolean includeClosingTag;
+    private boolean includeKnownTags;
 
     /**
      * Executes the SERZ starting tag detection process.
@@ -90,17 +91,21 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
      *
      * @since 1.0.0
      */
-    @SuppressWarnings("StringConcatenationArgumentToLogCall")
     @Override
     public Integer call() {
         Set<Byte> targetBytes = getIDBytes();
 
         LOGGER.info("Starting SERZ tag detection process... {}", startingDirectory.toAbsolutePath());
-        SERZTagDetector detector = new SERZTagDetector(threadCount, includeClosingTag);
+        SERZTagDetector detector = new SERZTagDetector(threadCount, includeKnownTags);
         Map<Byte, LongAdder> aggregatedCounts = detector.detect(startingDirectory, targetBytes);
 
         for (Map.Entry<Byte, LongAdder> entry : aggregatedCounts.entrySet()) {
-            LOGGER.info(String.format("Found %,15d occurrences of tag with ID 0x%02X", entry.getValue().sum(), entry.getKey()));
+            byte tagId = entry.getKey();
+            LOGGER.info("{}",String.format("Found %,15d occurrences of tag with ID 0x%02X %s",
+                    entry.getValue().sum(),
+                    tagId,
+                    SERZTagTypes.isKnownTagID(tagId) ? "(*)" : ""
+            ));
         }
         return 0;
     }

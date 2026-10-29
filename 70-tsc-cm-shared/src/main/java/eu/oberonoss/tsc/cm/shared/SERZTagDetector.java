@@ -3,6 +3,7 @@ package eu.oberonoss.tsc.cm.shared;
 import eu.oberon.oss.tools.binaryreader.BinaryDataReader;
 import eu.oberon.oss.tools.binaryreader.BinaryDataViewer;
 import eu.oberonoss.tsc.cm.base.GlobalConstants;
+import eu.oberonoss.tsc.cm.base.SERZTagTypes;
 import eu.oberonoss.tsc.cm.io.util.BinaryFileProcessor;
 import eu.oberonoss.tsc.cm.io.util.FileProcessor;
 import eu.oberonoss.tsc.cm.io.util.FileScanner;
@@ -54,7 +55,7 @@ public class SERZTagDetector {
     private static final Pattern PATTERN = Pattern.compile("0x([0-9A-F]{2})", Pattern.CASE_INSENSITIVE);
 
     private final int threadCount;
-    private final boolean includeClosingTag;
+    private final boolean includeKnownTags;
     private final ConcurrentHashMap<Byte, LongAdder> aggregatedCounts = new ConcurrentHashMap<>();
 
     /**
@@ -82,25 +83,25 @@ public class SERZTagDetector {
      * Creates a new SERZTagDetector with the specified closing tag inclusion setting and default
      * {@link eu.oberonoss.tsc.cm.base.util.HardwareDetails.HardwareDetailItem#CPU_CORE_COUNT} worker threads.
      *
-     * @param includeClosingTag Whether to include closing tags in detection.
+     * @param includeKnownTags Whether to include closing tags in detection.
      *
      * @since 1.0.0
      */
-    public SERZTagDetector(boolean includeClosingTag) {
-        this(CPU_CORE_COUNT.getInfo(), includeClosingTag);
+    public SERZTagDetector(boolean includeKnownTags) {
+        this(CPU_CORE_COUNT.getInfo(), includeKnownTags);
     }
 
     /**
      * Creates a new SERZTagDetector with the specified thread count and closing tag inclusion setting.
      *
-     * @param threadCount       The number of worker threads to use.
-     * @param includeClosingTag Whether to include closing tags in detection.
+     * @param threadCount      The number of worker threads to use.
+     * @param includeKnownTags Whether to include closing tags in detection.
      *
      * @since 1.0.0
      */
-    public SERZTagDetector(int threadCount, boolean includeClosingTag) {
+    public SERZTagDetector(int threadCount, boolean includeKnownTags) {
         this.threadCount = threadCount;
-        this.includeClosingTag = includeClosingTag;
+        this.includeKnownTags = includeKnownTags;
     }
 
     /**
@@ -197,29 +198,39 @@ public class SERZTagDetector {
         return temp;
     }
 
+
     private void patternScanner(BinaryDataReader reader, Set<Byte> targetBytes) {
         BinaryDataViewer viewer = reader.getViewer();
-        byte[] section = new byte[4]; // Local to thread execution
+        byte[] section = new byte[4];
 
         while (reader.remaining() > 0) {
             int step = 1;
             if (viewer.peekByte(reader.offset()) == MARKER_BYTE) {
-                if (reader.remaining() >= 4) {
-                    viewer.peekBytes(section, reader.offset());
-                    if (targetBytes.contains(section[1]) && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        step = 4;
-                    } else if (includeClosingTag && section[1] == CLOSING_TAG_BYTE) {
-                        aggregatedCounts.computeIfAbsent(section[1], _ -> new LongAdder()).increment();
-                        step = 2;
-                    }
-                } else if (includeClosingTag && reader.remaining() >= 2 && viewer.peekByte(reader.offset() + 1) == CLOSING_TAG_BYTE) {
-                    aggregatedCounts.computeIfAbsent(CLOSING_TAG_BYTE, _ -> new LongAdder()).increment();
-                    step = 2;
-                }
+                step = getStep(reader, targetBytes, viewer, section, step);
             }
             reader.offset(reader.offset() + step);
         }
+    }
+
+    private int getStep(BinaryDataReader reader, Set<Byte> targetBytes, BinaryDataViewer viewer, byte[] section, int step) {
+        if (reader.remaining() >= 4) {
+            viewer.peekBytes(section, reader.offset());
+            byte tagId = section[1];
+            boolean is4ByteTarget = (targetBytes != null && targetBytes.contains(tagId))
+                    || (includeKnownTags && SERZTagTypes.isKnownTagID(tagId) && tagId != CLOSING_TAG_BYTE);
+
+            if (is4ByteTarget && section[2] == MARKER_BYTE && section[3] == MARKER_BYTE) {
+                aggregatedCounts.computeIfAbsent(tagId, _ -> new LongAdder()).increment();
+                step = 4;
+            } else if (includeKnownTags && tagId == CLOSING_TAG_BYTE) {
+                aggregatedCounts.computeIfAbsent(CLOSING_TAG_BYTE, _ -> new LongAdder()).increment();
+                step = 2;
+            }
+        } else if (includeKnownTags && reader.remaining() >= 2 && viewer.peekByte(reader.offset() + 1) == CLOSING_TAG_BYTE) {
+            aggregatedCounts.computeIfAbsent(CLOSING_TAG_BYTE, _ -> new LongAdder()).increment();
+            step = 2;
+        }
+        return step;
     }
 
 }

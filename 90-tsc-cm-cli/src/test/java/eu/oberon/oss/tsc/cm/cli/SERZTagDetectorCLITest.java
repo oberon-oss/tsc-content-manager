@@ -3,7 +3,6 @@ package eu.oberon.oss.tsc.cm.cli;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
@@ -18,11 +17,11 @@ class SERZTagDetectorCLITest {
     private static final Path TEST_DIR = Paths.get("../20-tsc-cm-io/src/test/resources/util/serzdetector");
 
     @ParameterizedTest
-    @ValueSource(strings = {"--include-closing-tag=true", "--include-closing-tag=false"})
-    void testExecutionWithClosingTagOption(String closingTagOption) {
+    @ValueSource(strings = {"-k", "--include-known-tags", "--include-known-tags=true", "--include-known-tags=false"})
+    void testExecutionWithKnownTagsOption(String knownTagsOption) {
         SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", TEST_DIR.toString(), closingTagOption);
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), knownTagsOption);
         assertEquals(0, exitCode);
     }
 
@@ -30,7 +29,29 @@ class SERZTagDetectorCLITest {
     void testExecutionWithCustomOptions() {
         SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", TEST_DIR.toString(), "-i", "0x50,0x56", "-t", "2", "-c");
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), "-i", "0x50,0x56", "-t", "2", "-k");
+        assertEquals(0, exitCode);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "-f {dir} -i 0x50,0x56 -t 2 -k",
+            "--file-or-directory {dir} --id-bytes=0x50,0x56 --threads=2 --include-known-tags",
+            "-f {dir} -u -t 2 -k",
+            "--file-or-directory {dir} --tag-patterns --threads=4 --include-known-tags",
+            "-f {dir} -k",
+            "-f {dir} --include-known-tags=true",
+            "-f {dir} --include-known-tags=false",
+            "--file-or-directory {dir} --threads=1",
+            "-f {dir} -i 0x50",
+            "-f {dir} -u"
+    })
+    void testExecutionWithValidFlagCombinations(String commandLineArgs) {
+        SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
+        CommandLine cmd = new CommandLine(detector);
+        String formatted = commandLineArgs.replace("{dir}", TEST_DIR.toString());
+        String[] args = formatted.split(" ");
+        int exitCode = cmd.execute(args);
         assertEquals(0, exitCode);
     }
 
@@ -51,23 +72,27 @@ class SERZTagDetectorCLITest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-u", "--unknown-tags"})
-    void testExecutionWithUnknownTagsOption(String unknownTagsOption) {
+    @ValueSource(strings = {"-u", "--tag-patterns"})
+    void testExecutionWithTagPatternsOption(String tagPatternsOption) {
         SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", TEST_DIR.toString(), unknownTagsOption);
+        int exitCode = cmd.execute("-f", TEST_DIR.toString(), tagPatternsOption);
         assertEquals(0, exitCode);
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "-i, 0x50, -u",
-            "--id-bytes, 0x50, --unknown-tags"
+    @ValueSource(strings = {
+            "-f {dir} -i 0x50 -u",
+            "-f {dir} --id-bytes=0x50 --tag-patterns",
+            "-f {dir} -u -i 0x50",
+            "-f {dir} --tag-patterns --id-bytes=0x50"
     })
-    void testExecutionWithMutuallyExclusiveOptions(String idOption, String idValue, String unknownTagOption) {
+    void testExecutionWithMutuallyExclusiveOptions(String commandLineArgs) {
         SERZTagDetectorCLI detector = new SERZTagDetectorCLI();
         CommandLine cmd = new CommandLine(detector);
-        int exitCode = cmd.execute("-f", TEST_DIR.toString(), idOption, idValue, unknownTagOption);
+        String formatted = commandLineArgs.replace("{dir}", TEST_DIR.toString());
+        String[] args = formatted.split(" ");
+        int exitCode = cmd.execute(args);
         assertNotEquals(0, exitCode);
     }
 

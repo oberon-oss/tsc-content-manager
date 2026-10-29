@@ -73,6 +73,25 @@ public enum SERZTagTypes {
     }
 
     /**
+     * Checks if the given byte array is a known SERZ tag type.
+     *
+     * @param tagId The byte array to check.
+     *
+     * @return True if the byte array is a known SERZ tag type, false otherwise.
+     *
+     * @since 1.0.0
+     */
+    public static boolean isKnownTagID(byte tagId) {
+        for (SERZTagTypes type : values()) {
+            // Tag ID is at index 1 for both 4-byte and 2-byte tags (excluding FILE_HEADER)
+            if (type != FILE_HEADER && type.bytes.length > 1 && type.bytes[1] == tagId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the size of the byte array representing this tag type.
      *
      * @return The size of the byte array.
