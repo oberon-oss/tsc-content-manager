@@ -21,6 +21,7 @@
         <module>01-tsc-cm-base</module>
         <module>20-tsc-cm-io</module>
         <module>70-tsc-cm-shared</module>
+        <module>80-tsc-cm-gui</module>
         <module>90-tsc-cm-cli</module>
         <module>95-tsc-cm-app</module>
         <module>99-tsc-cm-jacoco</module>
@@ -80,6 +81,11 @@
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>
                 <artifactId>70-tsc-cm-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>80-tsc-cm-gui</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
