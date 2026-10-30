@@ -41,10 +41,6 @@
             <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>90-tsc-cm-cli</artifactId>
         </dependency>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>95-tsc-cm-app</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
