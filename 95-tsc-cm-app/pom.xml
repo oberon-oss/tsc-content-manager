@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--suppress MavenModelInspection -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -29,15 +30,15 @@
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>70-tsc-cm-shared</artifactId>
+            <artifactId>60-tsc-cm-shared</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>80-tsc-cm-gui</artifactId>
+            <artifactId>70-tsc-cm-gui</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>90-tsc-cm-cli</artifactId>
+            <artifactId>80-tsc-cm-cli</artifactId>
         </dependency>
     </dependencies>
 
@@ -71,12 +72,10 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
-                            <!--suppress MavenModelInspection -->
                             <deb>${project.build.directory}/tsc-content-manager_${project.version}_all.deb</deb>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <dataSet>
                                 <data>
-                                    <!--suppress MavenModelInspection -->
                                     <src>${project.build.directory}/staging/lib</src>
                                     <type>directory</type>
                                     <mapper>
@@ -140,6 +139,92 @@
                                     </mapper>
                                 </data>
                             </dataSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.3.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-rpm</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                        <configuration>
+                            <name>tsc-content-manager</name>
+                            <version>${project.version}</version>
+                            <group>Applications/System</group>
+                            <license>Proprietary</license>
+                            <packager>Oberon OSS</packager>
+                            <description>Main application package for tsc-content-manager</description>
+                            <mappings>
+                                <!-- Application libraries -->
+                                <mapping>
+                                    <directory>/usr/share/tsc-content-manager/lib</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.directory}/staging/lib</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Executables -->
+                                <mapping>
+                                    <directory>/usr/share/tsc-content-manager/bin</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/src/deb/bin/tool-runner</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/usr/bin</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/src/deb/bin/tool-runner</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Documentation -->
+                                <mapping>
+                                    <directory>/usr/share/doc/tsc-content-manager</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/src/deb/doc/copyright</location>
+                                        </source>
+                                        <source>
+                                            <location>${project.basedir}/src/deb/doc/changelog.gz</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Man pages -->
+                                <mapping>
+                                    <directory>/usr/share/man/man1</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/src/deb/man/tool-runner.1.gz</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
                         </configuration>
                     </execution>
                 </executions>

@@ -31,15 +31,15 @@
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>70-tsc-cm-shared</artifactId>
+            <artifactId>60-tsc-cm-shared</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>80-tsc-cm-gui</artifactId>
+            <artifactId>70-tsc-cm-gui</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>90-tsc-cm-cli</artifactId>
+            <artifactId>80-tsc-cm-cli</artifactId>
         </dependency>
     </dependencies>
 

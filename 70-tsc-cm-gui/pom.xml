@@ -10,10 +10,10 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>70-tsc-cm-shared</artifactId>
+    <artifactId>70-tsc-cm-gui</artifactId>
 
-    <name>70-tsc-cm-shared</name>
-    <description>Shared module for tsc-content-manager</description>
+    <name>70-tsc-cm-gui</name>
+    <description>User interface module for tsc-content-manager</description>
 
     <dependencies>
         <dependency>
@@ -28,6 +28,10 @@
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>20-tsc-cm-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>60-tsc-cm-shared</artifactId>
         </dependency>
     </dependencies>
 </project>
