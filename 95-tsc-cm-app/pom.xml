@@ -72,10 +72,12 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <!--suppress MavenModelInspection -->
                             <deb>${project.build.directory}/tsc-content-manager_${project.version}_all.deb</deb>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <dataSet>
                                 <data>
+                                    <!--suppress MavenModelInspection -->
                                     <src>${project.build.directory}/staging/lib</src>
                                     <type>directory</type>
                                     <mapper>
