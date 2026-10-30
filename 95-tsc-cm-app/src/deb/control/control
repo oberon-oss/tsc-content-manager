@@ -1,0 +1,9 @@
+Package: tsc-content-manager
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: default-jre (>= 21) | openjdk-21-jre-headless
+Maintainer: TigerLilly64 <info@oberon-oss.eu>
+Description: TSC Content Manager Command Line Tools
+ Unified command line tools and utilities for Train Simulator Classic (TSC) content management.

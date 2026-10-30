@@ -1,4 +1,4 @@
-package eu.oberon.oss.tsc.cm.cli;
+package eu.oberon.oss.tsc.cm.cli.tools;
 
 import eu.oberonoss.tsc.cm.base.SERZTagTypes;
 import eu.oberonoss.tsc.cm.shared.SERZTagDetector;
@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,8 @@ import java.util.concurrent.atomic.LongAdder;
  */
 @CommandLine.Command(
         name = "serz-tag-detector",
-        description = "Detects SERZ tags in binary files"
+        description = "Detects SERZ tags in binary files",
+        mixinStandardHelpOptions = true
 )
 @Slf4j
 public class SERZTagDetectorCLI implements Callable<Integer> {
@@ -99,13 +101,23 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
         SERZTagDetector detector = new SERZTagDetector(threadCount, includeKnownTags);
         Map<Byte, LongAdder> aggregatedCounts = detector.detect(startingDirectory, targetBytes);
 
+        // Let's calculate the TOTAL number of occurrences
+        Iterator<Map.Entry<Byte, LongAdder>> iterator = aggregatedCounts.entrySet().iterator();
+        long totalOccurrences = 0;
+
+        while(iterator.hasNext()) {
+            Map.Entry<Byte, LongAdder> next = iterator.next();
+            totalOccurrences += next.getValue().sum();
+        }
+
         for (Map.Entry<Byte, LongAdder> entry : aggregatedCounts.entrySet()) {
             byte tagId = entry.getKey();
-            LOGGER.info("{}",String.format("Found %,15d occurrences of tag with ID 0x%02X %s",
+            LOGGER.info("{}",String.format("Found %,15d occurrences of tag with ID 0x%02X %s (%3.2f%%)",
                     entry.getValue().sum(),
                     tagId,
-                    SERZTagTypes.isKnownTagID(tagId) ? "(*)" : ""
-            ));
+                    SERZTagTypes.isKnownTagID(tagId) ? "(*)" : "   ",
+                    (double) (entry.getValue().sum()) / totalOccurrences * 100.0)
+            );
         }
         return 0;
     }

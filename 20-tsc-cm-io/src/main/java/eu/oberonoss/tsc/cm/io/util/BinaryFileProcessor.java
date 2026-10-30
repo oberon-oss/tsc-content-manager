@@ -5,6 +5,7 @@ import eu.oberonoss.tsc.cm.base.FileDataType;
 
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 
@@ -23,13 +24,13 @@ public record BinaryFileProcessor(Consumer<BinaryDataReader> consumer) implement
         if (file.isDirectory()) {
             return true;
         }
-        try {
-            return SerzFileTypeDetector.SERZ_BINARY_CONTENT_TYPE.equalsIgnoreCase(Files.probeContentType(file.toPath()));
+        try (InputStream is = Files.newInputStream(file.toPath())) {
+            return SerzFileTypeDetector.isValidBinarySerzHeader(is.readNBytes(8));
         } catch (IOException _) {
             return false;
         }
     };
-
+    
     private static final FileDataType fileDataType = FileDataType.SERZ_BINARY;
 
     @Override

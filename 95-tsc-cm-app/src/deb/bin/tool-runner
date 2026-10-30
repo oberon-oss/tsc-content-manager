@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+# Base directory for application libraries
+APP_HOME="/usr/share/tsc-content-manager"
+LIB_DIR="${APP_HOME}/lib"
+
+# Construct wildcard classpath to include all tool and dependency JARs
+CLASSPATH="${LIB_DIR}/*"
+
+# Locate Java runtime
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    JAVA_CMD="$JAVA_HOME/bin/java"
+else
+    JAVA_CMD="java"
+fi
+
+# Execute ToolRunner with all supplied arguments
+exec "$JAVA_CMD" \
+    -cp "$CLASSPATH" \
+    eu.oberon.oss.tsc.cm.cli.ToolRunner \
+    "$@"

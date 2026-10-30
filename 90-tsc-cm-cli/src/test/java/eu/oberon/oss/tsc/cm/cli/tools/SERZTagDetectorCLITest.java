@@ -1,4 +1,4 @@
-package eu.oberon.oss.tsc.cm.cli;
+package eu.oberon.oss.tsc.cm.cli.tools;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
