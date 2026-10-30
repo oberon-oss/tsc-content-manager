@@ -1,0 +1,6 @@
+tsc-content-manager (1.0.0-SNAPSHOT) unstable; urgency=medium
+
+  * Initial package release.
+  * Added unified CLI runner and tools.
+
+ -- TigerLilly64 <info@oberon-oss.eu>  Fri, 30 Oct 2026 14:58:00 +0000

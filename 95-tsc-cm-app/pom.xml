@@ -108,6 +108,42 @@
                                         <filemode>755</filemode>
                                     </mapper>
                                 </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/doc/copyright</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/doc/tsc-content-manager</prefix>
+                                        <filemode>644</filemode>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/doc/changelog.gz</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/doc/tsc-content-manager</prefix>
+                                        <filemode>644</filemode>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/man/tool-runner.1.gz</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/man/man1</prefix>
+                                        <filemode>644</filemode>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/lintian/tsc-content-manager</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/lintian/overrides</prefix>
+                                        <filemode>644</filemode>
+                                    </mapper>
+                                </data>
                             </dataSet>
                         </configuration>
                     </execution>
