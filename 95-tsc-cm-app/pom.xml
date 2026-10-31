@@ -46,6 +46,29 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>compress-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/generated-docs"/>
+                                <gzip src="${project.basedir}/src/deb/doc/changelog"
+                                      destfile="${project.build.directory}/generated-docs/changelog.gz"/>
+                                <gzip src="${project.basedir}/src/deb/man/tool-runner.1"
+                                      destfile="${project.build.directory}/generated-docs/tool-runner.1.gz"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -112,7 +135,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/doc/changelog.gz</src>
+                                    <src>${project.build.directory}/generated-docs/changelog.gz</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -121,7 +144,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/man/tool-runner.1.gz</src>
+                                    <src>${project.build.directory}/generated-docs/tool-runner.1.gz</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -208,7 +231,7 @@
                                             <location>${project.basedir}/src/deb/doc/copyright</location>
                                         </source>
                                         <source>
-                                            <location>${project.basedir}/src/deb/doc/changelog.gz</location>
+                                            <location>${project.build.directory}/generated-docs/changelog.gz</location>
                                         </source>
                                     </sources>
                                 </mapping>
@@ -220,7 +243,7 @@
                                     <groupname>root</groupname>
                                     <sources>
                                         <source>
-                                            <location>${project.basedir}/src/deb/man/tool-runner.1.gz</location>
+                                            <location>${project.build.directory}/generated-docs/tool-runner.1.gz</location>
                                         </source>
                                     </sources>
                                 </mapping>

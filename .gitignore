@@ -38,7 +38,3 @@ build/
 ### Mac OS ###
 .DS_Store
 .sonar/
-
-# Exclude these files that are only needed for DEB packaging
-/95-tsc-cm-app/src/deb/doc/changelog.gz
-/95-tsc-cm-app/src/deb/man/tool-runner.1.gz
