@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
  * @since 1.0.0
  */
 @Command(
-        name = "tool-runner",
+        name = "tsc-tool-runner",
         description = "Unified entry point for TSC Content Manager command line tools",
         mixinStandardHelpOptions = true,
         subcommands = {

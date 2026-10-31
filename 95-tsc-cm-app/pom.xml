@@ -60,8 +60,8 @@
                                 <mkdir dir="${project.build.directory}/generated-docs"/>
                                 <gzip src="${project.basedir}/src/deb/doc/changelog"
                                       destfile="${project.build.directory}/generated-docs/changelog.gz"/>
-                                <gzip src="${project.basedir}/src/deb/man/tool-runner.1"
-                                      destfile="${project.build.directory}/generated-docs/tool-runner.1.gz"/>
+                                <gzip src="${project.basedir}/src/deb/man/tsc-tool-runner.1"
+                                      destfile="${project.build.directory}/generated-docs/tsc-tool-runner.1.gz"/>
                             </target>
                         </configuration>
                     </execution>
@@ -108,7 +108,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/bin/tool-runner</src>
+                                    <src>${project.basedir}/src/deb/bin/tsc-tool-runner</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -117,7 +117,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/bin/tool-runner</src>
+                                    <src>${project.basedir}/src/deb/bin/tsc-tool-runner</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -144,7 +144,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.build.directory}/generated-docs/tool-runner.1.gz</src>
+                                    <src>${project.build.directory}/generated-docs/tsc-tool-runner.1.gz</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -205,7 +205,7 @@
                                     <groupname>root</groupname>
                                     <sources>
                                         <source>
-                                            <location>${project.basedir}/src/deb/bin/tool-runner</location>
+                                            <location>${project.basedir}/src/deb/bin/tsc-tool-runner</location>
                                         </source>
                                     </sources>
                                 </mapping>
@@ -216,7 +216,7 @@
                                     <groupname>root</groupname>
                                     <sources>
                                         <source>
-                                            <location>${project.basedir}/src/deb/bin/tool-runner</location>
+                                            <location>${project.basedir}/src/deb/bin/tsc-tool-runner</location>
                                         </source>
                                     </sources>
                                 </mapping>
@@ -243,7 +243,7 @@
                                     <groupname>root</groupname>
                                     <sources>
                                         <source>
-                                            <location>${project.build.directory}/generated-docs/tool-runner.1.gz</location>
+                                            <location>${project.build.directory}/generated-docs/tsc-tool-runner.1.gz</location>
                                         </source>
                                     </sources>
                                 </mapping>
