@@ -23,7 +23,7 @@
         <module>60-tsc-cm-shared</module>
         <module>70-tsc-cm-gui</module>
         <module>80-tsc-cm-cli</module>
-        <module>95-tsc-cm-app</module>
+        <module>95-tsc-cm-packaging</module>
         <module>99-tsc-cm-jacoco</module>
     </modules>
 
@@ -95,8 +95,9 @@
             </dependency>
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>
-                <artifactId>95-tsc-cm-app</artifactId>
+                <artifactId>95-tsc-cm-packaging</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>

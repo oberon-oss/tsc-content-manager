@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress MavenModelInspection -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.oberon-oss.tsc</groupId>
+        <artifactId>95-tsc-cm-packaging</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>rpm</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>RPM packaging module for tsc-content-manager</description>
+
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>compress-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/generated-docs"/>
+                                <copy todir="${project.build.directory}/generated-docs">
+                                    <fileset dir="${project.basedir}/../src/shared/doc" includes="changelog"/>
+                                    <fileset dir="${project.basedir}/../src/shared/man" includes="tsc-tool-runner.1"/>
+                                </copy>
+                                <exec executable="gzip">
+                                    <arg value="-9n"/>
+                                    <arg value="-f"/>
+                                    <arg value="${project.build.directory}/generated-docs/changelog"/>
+                                    <arg value="${project.build.directory}/generated-docs/tsc-tool-runner.1"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/staging/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.3.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-rpm</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                        <configuration>
+                            <name>tsc-content-manager</name>
+                            <version>${project.version}</version>
+                            <group>Applications/System</group>
+                            <license>Proprietary</license>
+                            <packager>Oberon OSS</packager>
+                            <description>Main application package for tsc-content-manager</description>
+                            <mappings>
+                                <!-- Application libraries -->
+                                <mapping>
+                                    <directory>/usr/share/tsc-content-manager/lib</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.directory}/staging/lib</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Executables -->
+                                <mapping>
+                                    <directory>/usr/share/tsc-content-manager/bin</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/../src/shared/bin/tsc-tool-runner</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/usr/bin</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/../src/shared/bin/tsc-tool-runner</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Documentation -->
+                                <mapping>
+                                    <directory>/usr/share/doc/tsc-content-manager</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.basedir}/../src/shared/doc/copyright</location>
+                                        </source>
+                                        <source>
+                                            <location>${project.build.directory}/generated-docs/changelog.gz</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <!-- Man pages -->
+                                <mapping>
+                                    <directory>/usr/share/man/man1</directory>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.directory}/generated-docs/tsc-tool-runner.1.gz</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

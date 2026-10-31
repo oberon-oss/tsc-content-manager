@@ -6,41 +6,19 @@
 
     <parent>
         <groupId>eu.oberon-oss.tsc</groupId>
-        <artifactId>tsc-content-manager</artifactId>
+        <artifactId>95-tsc-cm-packaging</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>95-tsc-cm-app</artifactId>
+    <artifactId>deb</artifactId>
+    <packaging>pom</packaging>
 
-    <name>95-tsc-cm-app</name>
-    <description>Main application module for tsc-content-manager</description>
+    <name>${project.artifactId}</name>
+    <description>Debian packaging module for tsc-content-manager</description>
 
     <properties>
         <sonar.skip>true</sonar.skip>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>01-tsc-cm-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>20-tsc-cm-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>60-tsc-cm-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>70-tsc-cm-gui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.oberon-oss.tsc</groupId>
-            <artifactId>80-tsc-cm-cli</artifactId>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
@@ -59,8 +37,8 @@
                             <target>
                                 <mkdir dir="${project.build.directory}/generated-docs"/>
                                 <copy todir="${project.build.directory}/generated-docs">
-                                    <fileset dir="${project.basedir}/src/deb/doc" includes="changelog"/>
-                                    <fileset dir="${project.basedir}/src/deb/man" includes="tsc-tool-runner.1"/>
+                                    <fileset dir="${project.basedir}/../src/shared/doc" includes="changelog"/>
+                                    <fileset dir="${project.basedir}/../src/shared/man" includes="tsc-tool-runner.1"/>
                                 </copy>
                                 <exec executable="gzip">
                                     <arg value="-9n"/>
@@ -101,6 +79,7 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <skipPOMs>false</skipPOMs>
                             <deb>${project.build.directory}/tsc-content-manager_${project.version}_all.deb</deb>
                             <controlDir>${project.basedir}/src/deb/control</controlDir>
                             <dataSet>
@@ -114,7 +93,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/bin/tsc-tool-runner</src>
+                                    <src>${project.basedir}/../src/shared/bin/tsc-tool-runner</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -123,7 +102,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/bin/tsc-tool-runner</src>
+                                    <src>${project.basedir}/../src/shared/bin/tsc-tool-runner</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -132,7 +111,7 @@
                                     </mapper>
                                 </data>
                                 <data>
-                                    <src>${project.basedir}/src/deb/doc/copyright</src>
+                                    <src>${project.basedir}/../src/shared/doc/copyright</src>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
@@ -168,92 +147,6 @@
                                     </mapper>
                                 </data>
                             </dataSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.3.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-rpm</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>rpm</goal>
-                        </goals>
-                        <configuration>
-                            <name>tsc-content-manager</name>
-                            <version>${project.version}</version>
-                            <group>Applications/System</group>
-                            <license>Proprietary</license>
-                            <packager>Oberon OSS</packager>
-                            <description>Main application package for tsc-content-manager</description>
-                            <mappings>
-                                <!-- Application libraries -->
-                                <mapping>
-                                    <directory>/usr/share/tsc-content-manager/lib</directory>
-                                    <filemode>644</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${project.build.directory}/staging/lib</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                                <!-- Executables -->
-                                <mapping>
-                                    <directory>/usr/share/tsc-content-manager/bin</directory>
-                                    <filemode>755</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${project.basedir}/src/deb/bin/tsc-tool-runner</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                                <mapping>
-                                    <directory>/usr/bin</directory>
-                                    <filemode>755</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${project.basedir}/src/deb/bin/tsc-tool-runner</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                                <!-- Documentation -->
-                                <mapping>
-                                    <directory>/usr/share/doc/tsc-content-manager</directory>
-                                    <filemode>644</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${project.basedir}/src/deb/doc/copyright</location>
-                                        </source>
-                                        <source>
-                                            <location>${project.build.directory}/generated-docs/changelog.gz</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                                <!-- Man pages -->
-                                <mapping>
-                                    <directory>/usr/share/man/man1</directory>
-                                    <filemode>644</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${project.build.directory}/generated-docs/tsc-tool-runner.1.gz</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                            </mappings>
                         </configuration>
                     </execution>
                 </executions>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress MavenModelInspection -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.oberon-oss.tsc</groupId>
+        <artifactId>tsc-content-manager</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>95-tsc-cm-packaging</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>Packaging aggregator module for tsc-content-manager</description>
+
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>01-tsc-cm-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>20-tsc-cm-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>60-tsc-cm-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>70-tsc-cm-gui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>80-tsc-cm-cli</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>deb</id>
+            <modules>
+                <module>deb</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>rpm</id>
+            <modules>
+                <module>rpm</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
