@@ -58,10 +58,16 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${project.build.directory}/generated-docs"/>
-                                <gzip src="${project.basedir}/src/deb/doc/changelog"
-                                      destfile="${project.build.directory}/generated-docs/changelog.gz"/>
-                                <gzip src="${project.basedir}/src/deb/man/tsc-tool-runner.1"
-                                      destfile="${project.build.directory}/generated-docs/tsc-tool-runner.1.gz"/>
+                                <copy todir="${project.build.directory}/generated-docs">
+                                    <fileset dir="${project.basedir}/src/deb/doc" includes="changelog"/>
+                                    <fileset dir="${project.basedir}/src/deb/man" includes="tsc-tool-runner.1"/>
+                                </copy>
+                                <exec executable="gzip">
+                                    <arg value="-9n"/>
+                                    <arg value="-f"/>
+                                    <arg value="${project.build.directory}/generated-docs/changelog"/>
+                                    <arg value="${project.build.directory}/generated-docs/tsc-tool-runner.1"/>
+                                </exec>
                             </target>
                         </configuration>
                     </execution>
