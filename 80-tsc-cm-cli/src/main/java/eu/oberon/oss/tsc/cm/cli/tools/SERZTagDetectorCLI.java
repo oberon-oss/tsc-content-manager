@@ -1,5 +1,6 @@
 package eu.oberon.oss.tsc.cm.cli.tools;
 
+import eu.oberon.oss.tsc.cm.cli.ToolNameConverter;
 import eu.oberonoss.tsc.cm.base.SERZTagTypes;
 import eu.oberonoss.tsc.cm.shared.SERZTagDetector;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.LongAdder;
         description = "Detects SERZ tags in binary files",
         mixinStandardHelpOptions = true
 )
-@Slf4j
+@Slf4j(topic = "serz-tag-detector")
 public class SERZTagDetectorCLI implements Callable<Integer> {
 
     @CommandLine.Option(
@@ -83,7 +84,12 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
      * @since 1.0.0
      */
     static void main(String[] args) {
-        System.exit(new CommandLine(new SERZTagDetectorCLI()).execute(args));
+        CommandLine cmd = new CommandLine(new SERZTagDetectorCLI());
+        cmd.setExecutionStrategy(parseResult -> {
+            ToolNameConverter.setToolName(SERZTagDetectorCLI.class);
+            return new CommandLine.RunLast().execute(parseResult);
+        });
+        System.exit(cmd.execute(args));
     }
 
     /**
@@ -95,6 +101,7 @@ public class SERZTagDetectorCLI implements Callable<Integer> {
      */
     @Override
     public Integer call() {
+        ToolNameConverter.setToolName(getClass());
         Set<Byte> targetBytes = getIDBytes();
 
         LOGGER.info("Starting SERZ tag detection process... {}", startingDirectory.toAbsolutePath());

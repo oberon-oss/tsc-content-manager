@@ -45,13 +45,45 @@ public class ToolRunner implements Callable<Integer> {
     }
 
     /**
+     * Configures the active tool name based on the command or subcommand being executed.
+     *
+     * @param parseResult The parse result.
+     *
+     * @return Execution result code.
+     *
+     * @since 1.0.0
+     */
+    static int executionStrategy(CommandLine.ParseResult parseResult) {
+        CommandLine.ParseResult last = parseResult;
+        while (last.hasSubcommand()) {
+            last = last.subcommand();
+        }
+        String toolName = last.commandSpec().name();
+        ToolNameConverter.setToolName(toolName);
+        return new CommandLine.RunLast().execute(parseResult);
+    }
+
+    /**
+     * Creates a configured {@link CommandLine} instance for {@link ToolRunner}.
+     *
+     * @return Configured {@link CommandLine} instance.
+     *
+     * @since 1.0.0
+     */
+    public static CommandLine createCommandLine() {
+        CommandLine cmd = new CommandLine(new ToolRunner());
+        cmd.setExecutionStrategy(ToolRunner::executionStrategy);
+        return cmd;
+    }
+
+    /**
      * Entry point for running CLI tools.
      *
      * @param args Command line arguments.
      * @since 1.0.0
      */
     static void main(String[] args) {
-        int exitCode = new CommandLine(new ToolRunner()).execute(args);
+        int exitCode = createCommandLine().execute(args);
         System.exit(exitCode);
     }
 

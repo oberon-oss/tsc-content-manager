@@ -19,4 +19,4 @@ fi
 JAVA_OPTIONS="${JAVA_OPTIONS} --enable-native-access=ALL-UNNAMED"
 
 # Execute ToolRunner with all supplied arguments
-exec "$JAVA_CMD" "${JAVA_OPTIONS}" -cp "$CLASSPATH" eu.oberon.oss.tsc.cm.cli.ToolRunner "$@"
+exec "$JAVA_CMD" ${JAVA_OPTIONS} -cp "$CLASSPATH" eu.oberon.oss.tsc.cm.cli.ToolRunner "$@"

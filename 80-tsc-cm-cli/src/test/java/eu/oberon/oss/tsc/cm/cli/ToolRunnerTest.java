@@ -15,18 +15,17 @@ class ToolRunnerTest {
 
     @Test
     void testRootCommandInvocationWithoutSubcommand() {
-        ToolRunner toolRunner = new ToolRunner();
-        CommandLine cmd = new CommandLine(toolRunner);
+        CommandLine cmd = ToolRunner.createCommandLine();
 
         int exitCode = cmd.execute();
 
         assertEquals(0, exitCode);
+        assertEquals("tsc-tool-runner", ToolNameConverter.getToolName());
     }
 
     @Test
     void testRootCommandHelp() {
-        ToolRunner toolRunner = new ToolRunner();
-        CommandLine cmd = new CommandLine(toolRunner);
+        CommandLine cmd = ToolRunner.createCommandLine();
 
         int exitCode = cmd.execute("--help");
 
@@ -35,18 +34,17 @@ class ToolRunnerTest {
 
     @Test
     void testSubcommandExecution() {
-        ToolRunner toolRunner = new ToolRunner();
-        CommandLine cmd = new CommandLine(toolRunner);
+        CommandLine cmd = ToolRunner.createCommandLine();
 
         int exitCode = cmd.execute("serz-tag-detector", "-f", TEST_DIR.toString(), "-k");
 
         assertEquals(0, exitCode);
+        assertEquals("serz-tag-detector", ToolNameConverter.getToolName());
     }
 
     @Test
     void testSubcommandHelp() {
-        ToolRunner toolRunner = new ToolRunner();
-        CommandLine cmd = new CommandLine(toolRunner);
+        CommandLine cmd = ToolRunner.createCommandLine();
 
         int exitCode = cmd.execute("serz-tag-detector", "--help");
 
@@ -55,11 +53,29 @@ class ToolRunnerTest {
 
     @Test
     void testInvalidSubcommand() {
-        ToolRunner toolRunner = new ToolRunner();
-        CommandLine cmd = new CommandLine(toolRunner);
+        CommandLine cmd = ToolRunner.createCommandLine();
 
         int exitCode = cmd.execute("non-existent-tool");
 
         assertNotEquals(0, exitCode);
+    }
+
+    @CommandLine.Command(name = "sample-tool")
+    static class SampleTool implements java.util.concurrent.Callable<Integer> {
+        @Override
+        public Integer call() {
+            return 0;
+        }
+    }
+
+    @Test
+    void testDynamicSubcommandExecutionSetsToolName() {
+        CommandLine cmd = ToolRunner.createCommandLine();
+        cmd.addSubcommand("sample-tool", new SampleTool());
+
+        int exitCode = cmd.execute("sample-tool");
+
+        assertEquals(0, exitCode);
+        assertEquals("sample-tool", ToolNameConverter.getToolName());
     }
 }

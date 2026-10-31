@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -115,5 +116,13 @@ class SERZTagDetectorCLITest {
         Set<Byte> idBytes = detector.getIDBytes();
 
         assertEquals(256 - 5 - 1, idBytes.size());
+    }
+
+    @Test
+    void testLoggerTopic() throws NoSuchFieldException, IllegalAccessException {
+        Field loggerField = SERZTagDetectorCLI.class.getDeclaredField("LOGGER");
+        loggerField.setAccessible(true);
+        org.slf4j.Logger logger = (org.slf4j.Logger) loggerField.get(null);
+        assertEquals("serz-tag-detector", logger.getName());
     }
 }

@@ -1,9 +1,12 @@
 <configuration>
+    <conversionRule conversionWord="tool" class="eu.oberon.oss.tsc.cm.cli.ToolNameConverter"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{0}] %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%tool] %msg%n</pattern>
         </encoder>
     </appender>
+
+    <logger name="ch.qos.logback" level="WARN"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
