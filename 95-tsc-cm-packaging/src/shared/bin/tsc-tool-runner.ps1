@@ -45,6 +45,7 @@ if ($env:JAVA_OPTIONS)
     $JavaOptions += $env:JAVA_OPTIONS -split '\s+' | Where-Object { $_ -ne "" }
 }
 $JavaOptions += "--enable-native-access=ALL-UNNAMED"
+$JavaOptions += "-Dapp.home=$AppHome"
 
 # Execute ToolRunner with all supplied arguments
 & $JavaCmd @JavaOptions -cp $Classpath eu.oberon.oss.tsc.cm.cli.ToolRunner @args

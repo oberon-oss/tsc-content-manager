@@ -77,6 +77,40 @@ class DatabaseConfigTest {
     }
 
     @Test
+    void testResolveDefaultDbDirectoryWithAppHomeProperty(@TempDir Path tempDir) {
+        String originalAppHome = System.getProperty("app.home");
+        try {
+            System.setProperty("app.home", tempDir.toString());
+            Path resolved = DatabaseConfig.resolveDefaultDbDirectory();
+            assertThat(resolved).isEqualTo(tempDir.resolve("db"));
+
+            DatabaseConfig config = DatabaseConfig.createDefault();
+            assertThat(config.getDbDirectory()).isEqualTo(tempDir.resolve("db"));
+        } finally {
+            if (originalAppHome != null) {
+                System.setProperty("app.home", originalAppHome);
+            } else {
+                System.clearProperty("app.home");
+            }
+        }
+    }
+
+    @Test
+    void testResolveDefaultDbDirectoryFallback() {
+        String originalAppHome = System.getProperty("app.home");
+        try {
+            System.clearProperty("app.home");
+            Path resolved = DatabaseConfig.resolveDefaultDbDirectory();
+            assertThat(resolved).isNotNull();
+            assertThat(resolved).endsWith(java.nio.file.Paths.get(".tsc-content-manager", "db"));
+        } finally {
+            if (originalAppHome != null) {
+                System.setProperty("app.home", originalAppHome);
+            }
+        }
+    }
+
+    @Test
     void testToStringAndToBuilder() {
         DatabaseConfig config = DatabaseConfig.createInMemory("test-db");
         DatabaseConfig modified = config.toBuilder().autoMigrate(false).build();

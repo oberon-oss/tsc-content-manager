@@ -19,7 +19,8 @@ else
 fi
 
 # Configure JVM options
-JAVA_OPTIONS="${JAVA_OPTIONS} --enable-native-access=ALL-UNNAMED"
+JAVA_OPTIONS="${JAVA_OPTIONS} --enable-native-access=ALL-UNNAMED -Dapp.home=${APP_HOME}"
 
 # Execute ToolRunner with all supplied arguments
+# shellcheck disable=SC2086
 exec "$JAVA_CMD" ${JAVA_OPTIONS} -cp "$CLASSPATH" eu.oberon.oss.tsc.cm.cli.ToolRunner "$@"

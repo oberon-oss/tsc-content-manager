@@ -1,5 +1,6 @@
 package eu.oberon.oss.tsc.cm.cli;
 
+import eu.oberon.oss.tsc.cm.cli.tools.LiquibaseMigrationCLI;
 import eu.oberon.oss.tsc.cm.cli.tools.SERZTagDetectorCLI;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -17,7 +18,8 @@ import java.util.concurrent.Callable;
         description = "Unified entry point for TSC Content Manager command line tools",
         mixinStandardHelpOptions = true,
         subcommands = {
-                SERZTagDetectorCLI.class
+                SERZTagDetectorCLI.class,
+                LiquibaseMigrationCLI.class
         }
 )
 public class ToolRunner implements Callable<Integer> {

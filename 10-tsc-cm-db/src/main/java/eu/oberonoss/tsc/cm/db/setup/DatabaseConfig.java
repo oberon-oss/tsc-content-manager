@@ -36,7 +36,7 @@ public class DatabaseConfig {
     private final String dbName = DEFAULT_DB_NAME;
 
     @Builder.Default
-    private final Path dbDirectory = Paths.get(System.getProperty("user.home"), ".tsc-content-manager", "db");
+    private final Path dbDirectory = resolveDefaultDbDirectory();
 
     @Builder.Default
     private final boolean inMemory = false;
@@ -49,6 +49,27 @@ public class DatabaseConfig {
 
     @Builder.Default
     private final String changelogPath = DEFAULT_CHANGELOG_PATH;
+
+    /**
+     * Resolves the default directory where database files should reside.
+     * Checks the {@code app.home} system property and {@code APP_HOME} environment variable first,
+     * defaulting to {@code ~/.tsc-content-manager/db} if neither is configured.
+     *
+     * @return The default database directory path.
+     *
+     * @since 1.0.0
+     */
+    public static Path resolveDefaultDbDirectory() {
+        String appHome = System.getProperty("app.home");
+        if (appHome != null && !appHome.isBlank()) {
+            return Paths.get(appHome, "db");
+        }
+        String appHomeEnv = System.getenv("APP_HOME");
+        if (appHomeEnv != null && !appHomeEnv.isBlank()) {
+            return Paths.get(appHomeEnv, "db");
+        }
+        return Paths.get(System.getProperty("user.home"), ".tsc-content-manager", "db");
+    }
 
     /**
      * Creates a default file-based database configuration stored in the user home directory.
