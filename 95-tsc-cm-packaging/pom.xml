@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
-    <description>Packaging aggregator module for tsc-content-manager</description>
+    <description>Packaging module for tsc-content-manager</description>
 
     <properties>
         <sonar.skip>true</sonar.skip>
@@ -47,18 +47,28 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>deb</id>
-            <modules>
-                <module>deb</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>rpm</id>
-            <modules>
-                <module>rpm</module>
-            </modules>
-        </profile>
-    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/bin.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>tsc-content-manager-${project.version}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

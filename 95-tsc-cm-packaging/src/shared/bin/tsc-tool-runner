@@ -2,7 +2,10 @@
 set -e
 
 # Base directory for application libraries
-APP_HOME="/usr/share/tsc-content-manager"
+if [ -z "$APP_HOME" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    APP_HOME="$(cd "${SCRIPT_DIR}/.." && pwd)"
+fi
 LIB_DIR="${APP_HOME}/lib"
 
 # Construct wildcard classpath to include all tool and dependency JARs
