@@ -27,6 +27,10 @@
         </dependency>
         <dependency>
             <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>10-tsc-cm-db</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>20-tsc-cm-io</artifactId>
         </dependency>
         <dependency>

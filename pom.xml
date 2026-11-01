@@ -19,6 +19,7 @@
 
     <modules>
         <module>01-tsc-cm-base</module>
+        <module>10-tsc-cm-db</module>
         <module>20-tsc-cm-io</module>
         <module>60-tsc-cm-shared</module>
         <module>70-tsc-cm-gui</module>
@@ -28,6 +29,11 @@
     </modules>
 
     <properties>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <derby.version>10.17.1.0</derby.version>
+        <hibernate.version>6.6.10.Final</hibernate.version>
+        <jakarta-persistence.version>3.1.0</jakarta-persistence.version>
+        <liquibase.version>4.31.1</liquibase.version>
         <oshi-core.version>6.2.0</oshi-core.version>
         <!--suppress XmlUnresolvedReference -->
         <sonar.coverage.jacoco.xmlReportPaths>
@@ -67,10 +73,50 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi-core.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyshared</artifactId>
+                <version>${derby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbytools</artifactId>
+                <version>${derby.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${jakarta-persistence.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
             <!-- Project dependencies -->
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>
                 <artifactId>01-tsc-cm-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>10-tsc-cm-db</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
