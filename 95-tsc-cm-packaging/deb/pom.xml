@@ -146,6 +146,17 @@
                                         <filemode>644</filemode>
                                     </mapper>
                                 </data>
+                                <data>
+                                    <type>template</type>
+                                    <paths>
+                                        <path>/var/log/tsc-content-manager</path>
+                                        <path>/var/lib/tsc-content-manager</path>
+                                    </paths>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <filemode>755</filemode>
+                                    </mapper>
+                                </data>
                             </dataSet>
                         </configuration>
                     </execution>

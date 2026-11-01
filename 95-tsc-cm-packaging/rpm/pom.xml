@@ -149,6 +149,19 @@
                                         </source>
                                     </sources>
                                 </mapping>
+                                <!-- Logs and Database directories -->
+                                <mapping>
+                                    <directory>/var/log/tsc-content-manager</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                </mapping>
+                                <mapping>
+                                    <directory>/var/lib/tsc-content-manager</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                </mapping>
                             </mappings>
                         </configuration>
                     </execution>
