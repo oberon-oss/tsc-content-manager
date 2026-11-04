@@ -6,7 +6,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +49,7 @@ class SerzFileTypeDetectorTest {
     }
 
     @Test
-    void testIsSerzFileBinary() {
+    void testIsValidBinarySerzHeader() {
         byte[] validHeader = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
         byte[] invalidHeader = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x00, 0x00};
 
@@ -55,6 +57,26 @@ class SerzFileTypeDetectorTest {
         assertFalse(SerzFileTypeDetector.isValidBinarySerzHeader(invalidHeader));
         assertFalse(SerzFileTypeDetector.isValidBinarySerzHeader(null));
         assertFalse(SerzFileTypeDetector.isValidBinarySerzHeader(new byte[]{0x53, 0x45}));
+    }
+
+    @Test
+    void testIsBinarySerzFile() throws IOException {
+        byte[] validHeader = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00};
+        byte[] invalidHeader = {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x00, 0x00};
+        byte[] shortHeader = {0x53, 0x45};
+
+        try (InputStream is = new ByteArrayInputStream(validHeader)) {
+            assertTrue(SerzFileTypeDetector.isBinarySerzFile(is));
+        }
+        try (InputStream is = new ByteArrayInputStream(invalidHeader)) {
+            assertFalse(SerzFileTypeDetector.isBinarySerzFile(is));
+        }
+        try (InputStream is = new ByteArrayInputStream(shortHeader)) {
+            assertFalse(SerzFileTypeDetector.isBinarySerzFile(is));
+        }
+        try (InputStream is = new ByteArrayInputStream(new byte[0])) {
+            assertFalse(SerzFileTypeDetector.isBinarySerzFile(is));
+        }
     }
 
     public static Stream<Arguments> provideXmlTestCases() {
@@ -112,6 +134,15 @@ class SerzFileTypeDetectorTest {
                         null
                 )
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideXmlTestCases")
+    void testIsXmlSerzFile(String fileContent, String expectedContentType) throws IOException {
+        try (InputStream is = new ByteArrayInputStream(fileContent.getBytes(StandardCharsets.UTF_8))) {
+            boolean expected = SerzFileTypeDetector.SERZ_XML_CONTENT_TYPE.equals(expectedContentType);
+            assertEquals(expected, SerzFileTypeDetector.isXmlSerzFile(is));
+        }
     }
 
     @ParameterizedTest

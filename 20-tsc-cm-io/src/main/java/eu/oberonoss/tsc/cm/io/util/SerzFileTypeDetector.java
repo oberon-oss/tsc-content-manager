@@ -53,7 +53,7 @@ public class SerzFileTypeDetector extends FileTypeDetector {
     @Override
     public String probeContentType(Path path) throws IOException {
         try (InputStream is = Files.newInputStream(path)) {
-            if (isValidBinarySerzHeader(is.readNBytes(8))) {
+            if (isBinarySerzFile(is)) {
                 return SERZ_BINARY_CONTENT_TYPE;
             }
         }
@@ -78,8 +78,21 @@ public class SerzFileTypeDetector extends FileTypeDetector {
         if (header == null || header.length < 8) {
             return false;
         }
-
         return (Arrays.equals(SERZ_ID_SIGNATURE, 0, 8, header, 0, 8));
+    }
+
+    /**
+     * Checks if the first 8 bytes of the input stream matches the binary sequency of {@code {0x53, 0x45, 0x52, 0x5A, 0x00, 0x00, 0x01, 0x00}}
+     *
+     * @param is the input stream to read from
+     *
+     * @return {@code True} if the expected byte sequence is found, or {@code false} otherwise.
+     *
+     * @throws IOException If an error occurs when reading from the input stream.
+     * @since 1.0.0
+     */
+    public static boolean isBinarySerzFile(InputStream is) throws IOException {
+        return isValidBinarySerzHeader(is.readNBytes(8));
     }
 
     /**
@@ -92,7 +105,7 @@ public class SerzFileTypeDetector extends FileTypeDetector {
      * @throws IOException If an I/O error occurs reading from the input stream.
      * @since v1.0.0
      */
-    private static boolean isXmlSerzFile(@NotNull InputStream is) throws IOException {
+    public static boolean isXmlSerzFile(@NotNull InputStream is) throws IOException {
         char[] buffer = new char[512];
         int readCount;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
