@@ -1,7 +1,5 @@
 package eu.oberonoss.tsc.cm.io.util;
 
-import eu.oberonoss.tsc.cm.base.FileDataType;
-
 import java.io.FileFilter;
 import java.util.function.Consumer;
 
@@ -14,15 +12,6 @@ import java.util.function.Consumer;
  * @since 1.0.0
  */
 public interface FileProcessor<T> {
-    /**
-     * Retrieves the type of file data that this processor works with.
-     *
-     * @return The file data type, represented as a {@link FileDataType} enum value.
-     *
-     * @since 1.0.0
-     */
-    FileDataType getFileDataType();
-
     /**
      * Retrieves the file filter used by this processor to select files for processing.
      *

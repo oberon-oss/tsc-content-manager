@@ -1,7 +1,6 @@
 package eu.oberonoss.tsc.cm.io.util;
 
 import eu.oberon.oss.tools.binaryreader.BinaryDataReader;
-import eu.oberonoss.tsc.cm.base.FileDataType;
 
 import java.io.FileFilter;
 import java.io.IOException;
@@ -30,13 +29,6 @@ public record BinaryFileProcessor(Consumer<BinaryDataReader> consumer) implement
             return false;
         }
     };
-    
-    private static final FileDataType fileDataType = FileDataType.SERZ_BINARY;
-
-    @Override
-    public FileDataType getFileDataType() {
-        return fileDataType;
-    }
 
     @Override
     public FileFilter getFileFilter() {

@@ -102,7 +102,7 @@ class DatabaseConfigTest {
             System.clearProperty("app.home");
             Path resolved = DatabaseConfig.resolveDefaultDbDirectory();
             assertThat(resolved).isNotNull();
-            assertThat(resolved).endsWith(java.nio.file.Paths.get(".tsc-content-manager", "db"));
+            assertThat(resolved.endsWith(java.nio.file.Paths.get(".tsc-content-manager", "db"))).isTrue();
         } finally {
             if (originalAppHome != null) {
                 System.setProperty("app.home", originalAppHome);

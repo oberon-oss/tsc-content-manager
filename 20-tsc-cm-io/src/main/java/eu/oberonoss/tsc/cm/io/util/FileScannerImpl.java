@@ -1,10 +1,8 @@
 package eu.oberonoss.tsc.cm.io.util;
 
 import eu.oberonoss.tsc.cm.base.ByteLoaderImpl;
-import eu.oberonoss.tsc.cm.base.FileDataType;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +25,8 @@ import java.util.concurrent.atomic.LongAdder;
  * @author TigerLilly64
  * @since 1.0.0
  */
+@Slf4j
 public record FileScannerImpl(int threadCount) implements FileScanner {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileScannerImpl.class);
 
     /**
      * Creates a new FileScannerImpl with the default thread count.
@@ -118,9 +115,9 @@ public record FileScannerImpl(int threadCount) implements FileScanner {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T loadData(FileProcessor<T> processor, Path path) throws IOException {
-        if (processor.getFileDataType() == FileDataType.SERZ_BINARY) {
+        if (processor instanceof BinaryFileProcessor) {
             return (T) ByteLoaderImpl.getInstance().getBinaryDataReader(path);
         }
-        return null;
+        return (T) path.toFile();
     }
 }

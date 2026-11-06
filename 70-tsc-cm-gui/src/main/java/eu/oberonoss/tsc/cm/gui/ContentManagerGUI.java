@@ -14,6 +14,6 @@ public class ContentManagerGUI {
      * @since 1.0.0
      */
     public ContentManagerGUI() {
-        // Default constructor
+        ContentManager contentManager = new ContentManager();
     }
 }

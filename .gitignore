@@ -38,4 +38,4 @@ build/
 ### Mac OS ###
 .DS_Store
 .sonar/
-/10-tsc-cm-db/derby.log
+/**/derby.log
