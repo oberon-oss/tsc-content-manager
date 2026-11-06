@@ -155,7 +155,7 @@ public final class TSCInstallationDetector {
                 return candidate;
             }
         }
-        return candidates.isEmpty() ? Paths.get(userHome) : candidates.get(0);
+        return candidates.isEmpty() ? Paths.get(userHome) : candidates.getFirst();
     }
 
     /**

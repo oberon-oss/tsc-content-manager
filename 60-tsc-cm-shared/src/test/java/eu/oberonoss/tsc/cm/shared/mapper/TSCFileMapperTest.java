@@ -85,7 +85,7 @@ class TSCFileMapperTest {
     void testLookupMethodsWithNullAndNonExistentKeys() {
         assertNull(mapper.get((Path) null));
         assertNull(mapper.get((File) null));
-        assertNull(mapper.get((String) null, null));
+        assertNull(mapper.get(null, null));
 
         assertFalse(mapper.containsKey((Path) null));
         assertFalse(mapper.containsKey((File) null));
@@ -157,12 +157,14 @@ class TSCFileMapperTest {
 
     @Test
     void testIsEmpty() throws Exception {
-        assertEquals(mapper.size() == 0, mapper.isEmpty());
+        //noinspection SizeReplaceableByIsEmpty
+        assertTrue(mapper.size() == 0 && mapper.isEmpty());
 
         Constructor<TSCFileMapper> constructor = TSCFileMapper.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         TSCFileMapper testInstance = constructor.newInstance();
-        assertEquals(testInstance.size() == 0, testInstance.isEmpty());
+        //noinspection SizeReplaceableByIsEmpty
+        assertTrue(testInstance.size() == 0 && testInstance.isEmpty());
 
         java.lang.reflect.Field field = TSCFileMapper.class.getDeclaredField("fileMap");
         field.setAccessible(true);

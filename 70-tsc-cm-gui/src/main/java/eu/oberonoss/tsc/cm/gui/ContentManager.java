@@ -11,6 +11,7 @@ import java.awt.*;
 /**
  * @author fhdumay
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class ContentManager extends JFrame {
     public ContentManager() {
         initComponents();
