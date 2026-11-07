@@ -32,6 +32,7 @@ public abstract class AbstractDatabaseTest {
         }
     }
 
+    @SuppressWarnings("SqlNoDataSourceInspection")
     @AfterEach
     public void cleanupDatabaseTables() {
         if (sharedDatabaseManager != null && sharedDatabaseManager.isInitialized()) {

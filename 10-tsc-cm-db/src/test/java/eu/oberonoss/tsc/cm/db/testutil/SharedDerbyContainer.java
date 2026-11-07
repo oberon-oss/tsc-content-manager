@@ -43,6 +43,7 @@ public final class SharedDerbyContainer {
             synchronized (SharedDerbyContainer.class) {
                 if (container == null) {
                     String imageName = System.getProperty("testcontainers.derby.image", DEFAULT_IMAGE);
+                    //noinspection resource
                     GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
                             .withExposedPorts(DERBY_PORT)
                             .waitingFor(Wait.forListeningPort())

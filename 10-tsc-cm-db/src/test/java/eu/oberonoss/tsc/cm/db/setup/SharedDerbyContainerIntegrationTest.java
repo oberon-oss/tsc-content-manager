@@ -22,6 +22,7 @@ class SharedDerbyContainerIntegrationTest extends AbstractDatabaseTest {
         assertThat(SharedDerbyContainer.getHost()).isNotNull();
         assertThat(SharedDerbyContainer.getPort()).isPositive();
 
+        //noinspection SqlNoDataSourceInspection
         try (Connection conn = sharedDatabaseManager.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT count(*) FROM DATABASECHANGELOG")) {

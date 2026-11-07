@@ -44,6 +44,7 @@ class LiquibaseMigrationCLITest {
         try (Connection conn = DriverManager.getConnection(jdbcUrl);
              Statement stmt = conn.createStatement()) {
 
+            //noinspection SqlNoDataSourceInspection
             try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM DATABASECHANGELOG")) {
                 assertTrue(rs.next());
                 assertTrue(rs.getInt(1) >= 2);
