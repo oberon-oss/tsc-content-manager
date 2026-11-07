@@ -1,9 +1,13 @@
 package eu.oberonoss.tsc.cm.db.testutil;
 
 import eu.oberonoss.tsc.cm.db.setup.DatabaseConfig;
+import org.apache.derby.jdbc.ClientDataSource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+
+import java.sql.Connection;
+import java.time.Duration;
 
 /**
  * Shared singleton Derby Testcontainer instance for fast, reusable multi-module test execution.
@@ -46,14 +50,47 @@ public final class SharedDerbyContainer {
                     //noinspection resource
                     GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
                             .withExposedPorts(DERBY_PORT)
-                            .waitingFor(Wait.forListeningPort())
+                            .waitingFor(Wait.forLogMessage(".*started and ready to accept connections.*\\n", 1)
+                                    .withStartupTimeout(Duration.ofMinutes(2)))
                             .withReuse(true);
                     c.start();
+                    waitForDerbyReadiness(c);
                     container = c;
                 }
             }
         }
         return container;
+    }
+
+    private static void waitForDerbyReadiness(GenericContainer<?> c) {
+        String host = c.getHost();
+        int port = c.getMappedPort(DERBY_PORT);
+        long deadline = System.currentTimeMillis() + 30_000;
+        Exception lastException = null;
+
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                ClientDataSource ds = new ClientDataSource();
+                ds.setServerName(host);
+                ds.setPortNumber(port);
+                ds.setDatabaseName("derby_readiness_probe");
+                ds.setCreateDatabase("create");
+                try (Connection conn = ds.getConnection()) {
+                    if (conn != null && !conn.isClosed()) {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                lastException = e;
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for Derby container readiness", ie);
+                }
+            }
+        }
+        throw new RuntimeException("Derby container at " + host + ":" + port + " failed readiness check", lastException);
     }
 
     /**
