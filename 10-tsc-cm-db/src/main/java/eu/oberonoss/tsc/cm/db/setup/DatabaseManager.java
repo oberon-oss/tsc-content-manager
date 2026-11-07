@@ -2,6 +2,7 @@ package eu.oberonoss.tsc.cm.db.setup;
 
 import eu.oberonoss.tsc.cm.db.DatabaseException;
 import eu.oberonoss.tsc.cm.db.setup.jpa.JpaManager;
+import lombok.Getter;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,23 +40,24 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
+    //@formatter:off
+    /**
+     * The database configuration.
+     * --- GETTER ---
+     * @return The DatabaseConfig instance.
+     *
+     * @since 1.0.0
+     */
+    //@formatter:on
+    @SuppressWarnings({"JavadocDeclaration"})
+    @Getter
     private final DatabaseConfig config;
+
     private final LiquibaseManager liquibaseManager;
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private DataSource dataSource;
-
-    /**
-     * Retrieves the database configuration.
-     *
-     * @return The DatabaseConfig instance.
-     *
-     * @since 1.0.0
-     */
-    public DatabaseConfig getConfig() {
-        return config;
-    }
 
     /**
      * Creates a new DatabaseManager with the provided configuration.
