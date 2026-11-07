@@ -14,6 +14,7 @@ import java.sql.Statement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 class LiquibaseManagerTest {
 
     private String dbName;
