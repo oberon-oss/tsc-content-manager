@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class LiquibaseMigrationCLITest {
 
@@ -27,6 +28,7 @@ class LiquibaseMigrationCLITest {
 
     @Test
     void testExecutionRemoteDerbyContainer() throws SQLException {
+        assumeTrue(SharedDerbyContainer.isAvailable(), "Derby Testcontainer is not available in the current environment");
         String dbName = "cli_remote_test_" + System.nanoTime();
         LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
         CommandLine cmd = new CommandLine(cli);

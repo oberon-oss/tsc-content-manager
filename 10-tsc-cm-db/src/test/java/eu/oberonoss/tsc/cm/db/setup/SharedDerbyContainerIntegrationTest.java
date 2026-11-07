@@ -13,11 +13,13 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class SharedDerbyContainerIntegrationTest extends AbstractDatabaseTest {
 
     @Test
     void testSharedContainerIsRunningAndAccessible() throws Exception {
+        assumeTrue(SharedDerbyContainer.isAvailable(), "Derby Testcontainer is not available in the current environment");
         assertThat(SharedDerbyContainer.getInstance().isRunning()).isTrue();
         assertThat(SharedDerbyContainer.getHost()).isNotNull();
         assertThat(SharedDerbyContainer.getPort()).isPositive();
@@ -67,5 +69,28 @@ class SharedDerbyContainerIntegrationTest extends AbstractDatabaseTest {
 
         assertThat(files).hasSize(1);
         assertThat(files.getFirst().getFileSize()).isEqualTo(2048L);
+    }
+
+    @Test
+    void testCreateDatabaseConfigProducesValidConfig() {
+        var config = SharedDerbyContainer.createDatabaseConfig("test_db_config");
+        assertThat(config).isNotNull();
+        assertThat(config.getDbName()).isEqualTo("test_db_config");
+        assertThat(config.isAutoMigrate()).isTrue();
+        if (SharedDerbyContainer.isAvailable()) {
+            assertThat(config.isRemote()).isTrue();
+            assertThat(config.getHost()).isEqualTo(SharedDerbyContainer.getHost());
+            assertThat(config.getPort()).isEqualTo(SharedDerbyContainer.getPort());
+        } else {
+            assertThat(config.isInMemory()).isTrue();
+        }
+
+        String jdbcUrl = SharedDerbyContainer.getJdbcUrl("test_db_config");
+        assertThat(jdbcUrl).isNotBlank();
+        if (SharedDerbyContainer.isAvailable()) {
+            assertThat(jdbcUrl).startsWith("jdbc:derby://");
+        } else {
+            assertThat(jdbcUrl).startsWith("jdbc:derby:memory:");
+        }
     }
 }

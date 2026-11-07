@@ -2,6 +2,9 @@ package eu.oberonoss.tsc.cm.db.testutil;
 
 import eu.oberonoss.tsc.cm.db.setup.DatabaseConfig;
 import org.apache.derby.jdbc.ClientDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
@@ -11,11 +14,14 @@ import java.time.Duration;
 
 /**
  * Shared singleton Derby Testcontainer instance for fast, reusable multi-module test execution.
+ * Provides graceful fallback to an in-memory Derby database when containerization is unavailable.
  *
  * @author TigerLilly64
  * @since 1.0.0
  */
 public final class SharedDerbyContainer {
+
+    private static final Logger log = LoggerFactory.getLogger(SharedDerbyContainer.class);
 
     /**
      * Standard Apache Derby Network Server port.
@@ -33,6 +39,8 @@ public final class SharedDerbyContainer {
     public static final String SHARED_DB_NAME = "tsc_test_db";
 
     private static volatile GenericContainer<?> container;
+    private static volatile boolean initializationAttempted = false;
+    private static volatile boolean available = false;
 
     static {
         try {
@@ -49,28 +57,65 @@ public final class SharedDerbyContainer {
     }
 
     /**
-     * Retrieves or initializes the singleton Testcontainers GenericContainer instance running Derby.
+     * Checks whether Testcontainers and the Derby container are available and running in the current environment.
      *
-     * @return The running GenericContainer instance.
+     * @return True if the container is available and running, false otherwise.
      */
-    public static GenericContainer<?> getInstance() {
-        if (container == null) {
+    public static boolean isAvailable() {
+        if (!initializationAttempted) {
             synchronized (SharedDerbyContainer.class) {
-                if (container == null) {
-                    String imageName = System.getProperty("testcontainers.derby.image", DEFAULT_IMAGE);
-                    //noinspection resource
-                    GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
-                            .withExposedPorts(DERBY_PORT)
-                            .waitingFor(Wait.forLogMessage(".*started and ready to accept connections.*", 1)
-                                    .withStartupTimeout(Duration.ofMinutes(2)))
-                            .withReuse(true);
-                    c.start();
-                    waitForDerbyReadiness(c);
-                    container = c;
+                if (!initializationAttempted) {
+                    try {
+                        if (DockerClientFactory.instance().isDockerAvailable()) {
+                            container = createAndStartContainer();
+                            available = true;
+                        } else {
+                            log.warn("Docker environment is not available; falling back to in-memory Derby database.");
+                            available = false;
+                        }
+                    } catch (Throwable t) {
+                        log.warn("Failed to initialize Derby Testcontainer; falling back to in-memory Derby database: {}", t.getMessage());
+                        if (container != null) {
+                            try {
+                                container.stop();
+                            } catch (Exception _) {
+                            }
+                            container = null;
+                        }
+                        available = false;
+                    } finally {
+                        initializationAttempted = true;
+                    }
                 }
             }
         }
-        return container;
+        return available && container != null && container.isRunning();
+    }
+
+    /**
+     * Retrieves or initializes the singleton Testcontainers GenericContainer instance running Derby.
+     *
+     * @return The running GenericContainer instance.
+     * @throws IllegalStateException If Testcontainers is unavailable in the current environment.
+     */
+    public static GenericContainer<?> getInstance() {
+        if (isAvailable()) {
+            return container;
+        }
+        throw new IllegalStateException("Derby Testcontainer is not available in the current environment.");
+    }
+
+    private static GenericContainer<?> createAndStartContainer() {
+        String imageName = System.getProperty("testcontainers.derby.image", DEFAULT_IMAGE);
+        //noinspection resource
+        GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
+                .withExposedPorts(DERBY_PORT)
+                .waitingFor(Wait.forLogMessage(".*started and ready to accept connections.*", 1)
+                        .withStartupTimeout(Duration.ofMinutes(2)))
+                .withReuse(true);
+        c.start();
+        waitForDerbyReadiness(c);
+        return c;
     }
 
     private static void waitForDerbyReadiness(GenericContainer<?> c) {
@@ -125,30 +170,39 @@ public final class SharedDerbyContainer {
     }
 
     /**
-     * Constructs a JDBC URL pointing to the running container instance for the specified database name.
+     * Constructs a JDBC URL pointing to the running container instance or in-memory database for the specified database name.
      *
      * @param dbName The database name.
-     *
-     * @return The remote JDBC URL.
+     * @return The remote or in-memory JDBC URL.
      */
     public static String getJdbcUrl(String dbName) {
-        return String.format("jdbc:derby://%s:%d/%s;create=true",
-                getHost(),
-                getPort(),
-                dbName);
+        if (isAvailable()) {
+            return String.format("jdbc:derby://%s:%d/%s;create=true",
+                    getHost(),
+                    getPort(),
+                    dbName);
+        }
+        return String.format("jdbc:derby:memory:%s;create=true", dbName);
     }
 
     /**
-     * Creates a {@link DatabaseConfig} targeting the running container for the given database name.
+     * Creates a {@link DatabaseConfig} targeting the running container or falling back to in-memory mode for the given database name.
      *
      * @param dbName The database name.
-     *
      * @return The configured {@link DatabaseConfig}.
      */
     public static DatabaseConfig createDatabaseConfig(String dbName) {
+        if (isAvailable()) {
+            return DatabaseConfig.builder()
+                    .host(getHost())
+                    .port(getPort())
+                    .dbName(dbName)
+                    .autoMigrate(true)
+                    .build();
+        }
+        log.info("Derby container unavailable; creating in-memory DatabaseConfig for '{}'", dbName);
         return DatabaseConfig.builder()
-                .host(getHost())
-                .port(getPort())
+                .inMemory(true)
                 .dbName(dbName)
                 .autoMigrate(true)
                 .build();
