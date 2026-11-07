@@ -83,6 +83,7 @@ public final class SharedDerbyContainer {
             } catch (Exception e) {
                 lastException = e;
                 try {
+                    //noinspection BusyWait - May be replaced with Awaitability library if more sleeps are needed in the application
                     Thread.sleep(200);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
