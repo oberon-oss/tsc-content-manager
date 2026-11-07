@@ -27,11 +27,9 @@ public class TSCApplication {
     /**
      * Entry point for running the TSC application GUI.
      *
-     * @param args Command line arguments.
-     *
      * @since 1.0.0
      */
-    public static void main(String[] args) {
+    public static void main() {
         LOGGER.info("Starting TSC Application GUI...");
         SwingUtilities.invokeLater(() -> {
             TSCApplication app = new TSCApplication();

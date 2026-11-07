@@ -44,9 +44,9 @@ class TSCApplicationCLITest {
 
         assertNotNull(command);
         assertFalse(command.isEmpty());
-        assertEquals(cli.getJavaExecutable(), command.get(0));
+        assertEquals(cli.getJavaExecutable(), command.getFirst());
         assertTrue(command.contains("-cp"));
-        assertEquals(TSCApplication.class.getName(), command.get(command.size() - 1));
+        assertEquals(TSCApplication.class.getName(), command.getLast());
     }
 
     @Test
@@ -62,7 +62,7 @@ class TSCApplicationCLITest {
             assertTrue(command.contains("-Xmx512m"));
             assertTrue(command.contains("-Dcustom.prop=test"));
             assertTrue(command.contains("-cp"));
-            assertEquals(TSCApplication.class.getName(), command.get(command.size() - 1));
+            assertEquals(TSCApplication.class.getName(), command.getLast());
         } finally {
             if (originalAppHome != null) {
                 System.setProperty("app.home", originalAppHome);

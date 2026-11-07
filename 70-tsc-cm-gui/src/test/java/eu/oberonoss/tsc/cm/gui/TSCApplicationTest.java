@@ -25,6 +25,6 @@ class TSCApplicationTest {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-        assertDoesNotThrow(() -> TSCApplication.main(new String[]{}));
+        assertDoesNotThrow(() -> TSCApplication.main());
     }
 }

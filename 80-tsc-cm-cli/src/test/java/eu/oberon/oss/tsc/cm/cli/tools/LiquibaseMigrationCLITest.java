@@ -34,6 +34,7 @@ class LiquibaseMigrationCLITest {
         assertEquals(0, exitCode);
     }
 
+    @SuppressWarnings("SqlNoDataSourceInspection")
     @Test
     void testExecutionInDirectory(@TempDir Path tempDir) throws SQLException {
         LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
