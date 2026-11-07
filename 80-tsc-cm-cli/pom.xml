@@ -41,6 +41,10 @@
             <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>60-tsc-cm-shared</artifactId>
         </dependency>
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>70-tsc-cm-gui</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

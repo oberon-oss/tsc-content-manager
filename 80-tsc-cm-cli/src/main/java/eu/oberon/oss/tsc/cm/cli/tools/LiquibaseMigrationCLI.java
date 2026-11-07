@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
  */
 @Command(
         name = "liquibase-migration",
-        aliases = {"db-migrate", "liquibase-migrate"},
         description = "Executes Liquibase database migrations for TSC Content Manager",
         mixinStandardHelpOptions = true
 )

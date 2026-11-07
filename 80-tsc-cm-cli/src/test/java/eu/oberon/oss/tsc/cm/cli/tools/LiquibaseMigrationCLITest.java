@@ -12,15 +12,9 @@ import picocli.CommandLine;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LiquibaseMigrationCLITest {
 
@@ -126,13 +120,12 @@ class LiquibaseMigrationCLITest {
     }
 
     @Test
-    void testToolRunnerAliasExecution() {
-        CommandLine cmd = ToolRunner.createCommandLine();
-
-        int exitCode = cmd.execute("db-migrate", "-m", "-n", "mem-alias-" + System.nanoTime());
-
-        assertEquals(0, exitCode);
-        assertEquals("liquibase-migration", ToolNameConverter.getToolName());
+    void testCommandAnnotation() {
+        CommandLine.Command annotation = LiquibaseMigrationCLI.class.getAnnotation(CommandLine.Command.class);
+        assertNotNull(annotation);
+        assertEquals("liquibase-migration", annotation.name());
+        assertArrayEquals(new String[]{}, annotation.aliases());
+        assertTrue(annotation.mixinStandardHelpOptions());
     }
 
     @Test

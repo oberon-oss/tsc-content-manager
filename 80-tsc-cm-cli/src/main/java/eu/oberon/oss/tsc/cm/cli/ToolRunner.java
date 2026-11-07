@@ -2,6 +2,7 @@ package eu.oberon.oss.tsc.cm.cli;
 
 import eu.oberon.oss.tsc.cm.cli.tools.LiquibaseMigrationCLI;
 import eu.oberon.oss.tsc.cm.cli.tools.SERZTagDetectorCLI;
+import eu.oberon.oss.tsc.cm.cli.tools.TSCApplicationCLI;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -19,7 +20,8 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         subcommands = {
                 SERZTagDetectorCLI.class,
-                LiquibaseMigrationCLI.class
+                LiquibaseMigrationCLI.class,
+                TSCApplicationCLI.class
         }
 )
 public class ToolRunner implements Callable<Integer> {
