@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import javax.swing.*;
 import java.awt.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TSCApplicationTest {
 
@@ -26,6 +25,6 @@ class TSCApplicationTest {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-        assertDoesNotThrow(TSCApp lication::main);
+        assertDoesNotThrow(TSCApplication::main);
     }
 }
