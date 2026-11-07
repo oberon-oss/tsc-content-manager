@@ -50,9 +50,9 @@ public class DatabaseConfig {
     @Builder.Default
     private final String changelogPath = DEFAULT_CHANGELOG_PATH;
 
-    private String host;
+    private final String host;
 
-    private Integer port;
+    private final Integer port;
 
     /**
      * Resolves the default directory where database files should reside.

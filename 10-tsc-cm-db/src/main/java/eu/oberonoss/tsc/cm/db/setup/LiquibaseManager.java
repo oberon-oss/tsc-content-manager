@@ -4,6 +4,7 @@ import eu.oberonoss.tsc.cm.db.DatabaseException;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
+import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Manages Liquibase database migrations for schema creation and updates.
@@ -72,6 +74,14 @@ public class LiquibaseManager {
             }
             Contexts ctx = contexts != null ? new Contexts(contexts) : new Contexts();
             LabelExpression lbl = labels != null ? new LabelExpression(labels) : new LabelExpression();
+
+            List<ChangeSet> unrunChangeSets = liquibase.listUnrunChangeSets(ctx, lbl);
+            if (unrunChangeSets == null || unrunChangeSets.isEmpty()) {
+                log.info("Database schema is already up to date. Skipping Liquibase migration.");
+                return;
+            }
+
+            log.info("Found {} unrun change set(s). Executing migrations...", unrunChangeSets.size());
             liquibase.update(ctx, lbl);
 
             if (!connection.getAutoCommit()) {
@@ -113,6 +123,57 @@ public class LiquibaseManager {
             runMigrations(connection, changelogPath);
         } catch (SQLException e) {
             throw new DatabaseException("Failed to obtain database connection for migrations: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Checks if there are any unrun change sets for the given connection and changelog.
+     *
+     * @param connection    The active database connection.
+     * @param changelogPath The resource path to the master changelog file.
+     *
+     * @return True if there are unrun change sets, false if the database is already up to date.
+     *
+     * @throws DatabaseException If checking unrun change sets fails.
+     * @since 1.0.0
+     */
+    public boolean hasPendingMigrations(Connection connection, String changelogPath) {
+        return hasPendingMigrations(connection, changelogPath, null, null);
+    }
+
+    /**
+     * Checks if there are any unrun change sets for the given connection, changelog, contexts, and labels.
+     *
+     * @param connection    The active database connection.
+     * @param changelogPath The resource path to the master changelog file.
+     * @param contexts      Optional Liquibase contexts.
+     * @param labels        Optional Liquibase labels.
+     *
+     * @return True if there are unrun change sets, false if the database is already up to date.
+     *
+     * @throws DatabaseException If checking unrun change sets fails.
+     * @since 1.0.0
+     */
+    public boolean hasPendingMigrations(Connection connection, String changelogPath, String contexts, String labels) {
+        try (Database database = DatabaseFactory.getInstance()
+                .findCorrectDatabaseImplementation(new JdbcConnection(connection) {
+                    @Override
+                    public void close() {
+                        // Do not close caller-managed connection
+                    }
+                });
+             ClassLoaderResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
+             Liquibase liquibase = new Liquibase(changelogPath, resourceAccessor, database)) {
+            if (database instanceof liquibase.database.core.DerbyDatabase derbyDb) {
+                derbyDb.setShutdownEmbeddedDerby(false);
+            }
+            Contexts ctx = contexts != null ? new Contexts(contexts) : new Contexts();
+            LabelExpression lbl = labels != null ? new LabelExpression(labels) : new LabelExpression();
+            List<ChangeSet> unrunChangeSets = liquibase.listUnrunChangeSets(ctx, lbl);
+            return unrunChangeSets != null && !unrunChangeSets.isEmpty();
+        } catch (Exception e) {
+            log.warn("Failed to check pending migrations, defaulting to true: {}", e.getMessage());
+            return true;
         }
     }
 }

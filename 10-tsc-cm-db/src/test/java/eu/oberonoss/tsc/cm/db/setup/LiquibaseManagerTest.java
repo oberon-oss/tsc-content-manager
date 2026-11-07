@@ -91,6 +91,20 @@ class LiquibaseManagerTest {
     }
 
     @Test
+    void testHasPendingMigrations() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            // Before migrations run, pending migrations should be true
+            assertThat(liquibaseManager.hasPendingMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH)).isTrue();
+
+            // Run migrations
+            liquibaseManager.runMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH);
+
+            // After migrations run, pending migrations should be false
+            assertThat(liquibaseManager.hasPendingMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH)).isFalse();
+        }
+    }
+
+    @Test
     void testInvalidChangelogThrowsException() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             assertThatThrownBy(() -> liquibaseManager.runMigrations(connection, "non-existent-changelog.xml"))
