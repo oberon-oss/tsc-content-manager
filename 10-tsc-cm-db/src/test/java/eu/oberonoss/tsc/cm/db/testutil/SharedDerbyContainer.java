@@ -34,6 +34,17 @@ public final class SharedDerbyContainer {
 
     private static volatile GenericContainer<?> container;
 
+    static {
+        try {
+            java.nio.file.Path propFile = java.nio.file.Path.of(System.getProperty("user.home"), ".testcontainers.properties");
+            if (!java.nio.file.Files.exists(propFile)) {
+                java.nio.file.Files.writeString(propFile, "testcontainers.reuse.enable=true\n");
+            }
+        } catch (Exception _) {
+            // Fall back gracefully if environment permissions restrict writing to user home
+        }
+    }
+
     private SharedDerbyContainer() {
     }
 
@@ -50,8 +61,7 @@ public final class SharedDerbyContainer {
                     //noinspection resource
                     GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
                             .withExposedPorts(DERBY_PORT)
-                            .waitingFor(Wait.forLogMessage(".*started and ready to accept connections.*\\n", 1)
-                                    .withStartupTimeout(Duration.ofMinutes(2)))
+                            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)))
                             .withReuse(true);
                     c.start();
                     waitForDerbyReadiness(c);
