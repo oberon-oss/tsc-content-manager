@@ -61,7 +61,8 @@ public final class SharedDerbyContainer {
                     //noinspection resource
                     GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse(imageName))
                             .withExposedPorts(DERBY_PORT)
-                            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)))
+                            .waitingFor(Wait.forLogMessage(".*started and ready to accept connections.*", 1)
+                                    .withStartupTimeout(Duration.ofMinutes(2)))
                             .withReuse(true);
                     c.start();
                     waitForDerbyReadiness(c);
@@ -101,7 +102,8 @@ public final class SharedDerbyContainer {
                 }
             }
         }
-        throw new RuntimeException("Derby container at " + host + ":" + port + " failed readiness check", lastException);
+        throw new RuntimeException("Derby container at " + host + ":" + port + " failed readiness check: "
+                + (lastException != null ? lastException.getMessage() : "timeout"), lastException);
     }
 
     /**
