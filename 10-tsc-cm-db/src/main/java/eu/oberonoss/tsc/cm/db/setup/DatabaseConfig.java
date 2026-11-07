@@ -50,6 +50,12 @@ public class DatabaseConfig {
     @Builder.Default
     private final String changelogPath = DEFAULT_CHANGELOG_PATH;
 
+    @Builder.Default
+    private final String host = null;
+
+    @Builder.Default
+    private final Integer port = null;
+
     /**
      * Resolves the default directory where database files should reside.
      * Checks the {@code app.home} system property and {@code APP_HOME} environment variable first,
@@ -128,13 +134,57 @@ public class DatabaseConfig {
     }
 
     /**
-     * Constructs the JDBC URL for connecting to the embedded Derby database.
+     * Checks whether this database configuration points to a remote/network Derby server.
+     *
+     * @return True if remote host and port are configured, false otherwise.
+     *
+     * @since 1.0.0
+     */
+    public boolean isRemote() {
+        return host != null && !host.isBlank() && port != null && port > 0;
+    }
+
+    /**
+     * Creates a remote database configuration connected to a Derby Network Server.
+     *
+     * @param host   The host name or IP address of the Derby Network Server.
+     * @param port   The port number of the Derby Network Server.
+     * @param dbName The name of the database.
+     *
+     * @return A DatabaseConfig instance configured for remote execution.
+     *
+     * @since 1.0.0
+     */
+    public static DatabaseConfig createRemote(String host, int port, String dbName) {
+        return DatabaseConfig.builder()
+                .host(host)
+                .port(port)
+                .dbName(dbName)
+                .inMemory(false)
+                .build();
+    }
+
+    /**
+     * Constructs the JDBC URL for connecting to the embedded or remote Derby database.
      *
      * @return The JDBC connection URL.
      *
      * @since 1.0.0
      */
     public String getJdbcUrl() {
+        if (isRemote()) {
+            StringBuilder url = new StringBuilder("jdbc:derby://")
+                    .append(host)
+                    .append(":")
+                    .append(port)
+                    .append("/")
+                    .append(dbName);
+            if (create) {
+                url.append(";create=true");
+            }
+            return url.toString();
+        }
+
         StringBuilder url = new StringBuilder("jdbc:derby:");
         if (inMemory) {
             url.append("memory:").append(dbName);
@@ -158,6 +208,10 @@ public class DatabaseConfig {
      * @since 1.0.0
      */
     public String getShutdownUrl() {
+        if (isRemote()) {
+            return String.format("jdbc:derby://%s:%d/%s;shutdown=true", host, port, dbName);
+        }
+
         StringBuilder url = new StringBuilder("jdbc:derby:");
         if (inMemory) {
             url.append("memory:").append(dbName).append(";drop=true");

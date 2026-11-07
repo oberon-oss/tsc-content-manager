@@ -32,6 +32,11 @@ public class DatabaseManager implements AutoCloseable {
         } catch (ClassNotFoundException e) {
             log.warn("Derby EmbeddedDriver not found on classpath", e);
         }
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+        } catch (ClassNotFoundException e) {
+            log.debug("Derby ClientDriver not found on classpath");
+        }
     }
 
     private final DatabaseConfig config;
@@ -39,7 +44,7 @@ public class DatabaseManager implements AutoCloseable {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private EmbeddedDataSource dataSource;
+    private DataSource dataSource;
 
     /**
      * Retrieves the database configuration.
@@ -91,26 +96,39 @@ public class DatabaseManager implements AutoCloseable {
             return;
         }
 
-        log.info("Initializing embedded Derby database with URL: {}", config.getJdbcUrl());
+        log.info("Initializing Derby database with URL: {}", config.getJdbcUrl());
         try {
-            EmbeddedDataSource ds = new EmbeddedDataSource();
-            if (config.isInMemory()) {
-                ds.setDatabaseName("memory:" + config.getDbName());
-            } else if (config.getDbDirectory() != null) {
-                ds.setDatabaseName(config.getDbDirectory().resolve(config.getDbName()).toAbsolutePath().toString());
+            DataSource ds;
+            if (config.isRemote()) {
+                org.apache.derby.jdbc.ClientDataSource clientDs = new org.apache.derby.jdbc.ClientDataSource();
+                clientDs.setServerName(config.getHost());
+                clientDs.setPortNumber(config.getPort());
+                clientDs.setDatabaseName(config.getDbName());
+                if (config.isCreate()) {
+                    clientDs.setCreateDatabase("create");
+                }
+                ds = clientDs;
             } else {
-                ds.setDatabaseName(config.getDbName());
-            }
+                EmbeddedDataSource embeddedDs = new EmbeddedDataSource();
+                if (config.isInMemory()) {
+                    embeddedDs.setDatabaseName("memory:" + config.getDbName());
+                } else if (config.getDbDirectory() != null) {
+                    embeddedDs.setDatabaseName(config.getDbDirectory().resolve(config.getDbName()).toAbsolutePath().toString());
+                } else {
+                    embeddedDs.setDatabaseName(config.getDbName());
+                }
 
-            if (config.isCreate()) {
-                ds.setCreateDatabase("create");
+                if (config.isCreate()) {
+                    embeddedDs.setCreateDatabase("create");
+                }
+                ds = embeddedDs;
             }
 
             this.dataSource = ds;
 
             // Verify connection and run initial migrations if autoMigrate is enabled
             try (Connection conn = dataSource.getConnection()) {
-                log.info("Successfully connected to embedded Derby DB: {}", conn.getMetaData().getDatabaseProductName());
+                log.info("Successfully connected to Derby DB: {}", conn.getMetaData().getDatabaseProductName());
                 if (config.isAutoMigrate()) {
                     liquibaseManager.runMigrations(conn, config.getChangelogPath());
                 }
@@ -118,8 +136,8 @@ public class DatabaseManager implements AutoCloseable {
 
             initialized.set(true);
         } catch (SQLException e) {
-            log.error("Failed to initialize embedded Derby database", e);
-            throw new DatabaseException("Failed to initialize embedded Derby database: " + e.getMessage(), e);
+            log.error("Failed to initialize Derby database", e);
+            throw new DatabaseException("Failed to initialize Derby database: " + e.getMessage(), e);
         }
     }
 
@@ -204,6 +222,13 @@ public class DatabaseManager implements AutoCloseable {
      */
     public synchronized void shutdown() {
         if (closed.get()) {
+            return;
+        }
+
+        if (config.isRemote()) {
+            log.info("Closing remote Derby database manager connection: {}", config.getDbName());
+            closed.set(true);
+            initialized.set(false);
             return;
         }
 

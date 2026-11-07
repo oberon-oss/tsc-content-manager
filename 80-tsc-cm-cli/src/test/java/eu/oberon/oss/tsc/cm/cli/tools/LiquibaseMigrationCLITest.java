@@ -2,6 +2,7 @@ package eu.oberon.oss.tsc.cm.cli.tools;
 
 import eu.oberon.oss.tsc.cm.cli.ToolNameConverter;
 import eu.oberon.oss.tsc.cm.cli.ToolRunner;
+import eu.oberonoss.tsc.cm.db.testutil.SharedDerbyContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,32 @@ class LiquibaseMigrationCLITest {
     @AfterEach
     void cleanUp() {
         ToolNameConverter.reset();
+    }
+
+    @Test
+    void testExecutionRemoteDerbyContainer() throws SQLException {
+        String dbName = "cli_remote_test_" + System.nanoTime();
+        LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
+        CommandLine cmd = new CommandLine(cli);
+
+        int exitCode = cmd.execute(
+                "-H", SharedDerbyContainer.getHost(),
+                "-P", String.valueOf(SharedDerbyContainer.getPort()),
+                "-n", dbName
+        );
+
+        assertEquals(0, exitCode);
+
+        // Verify Derby database migrations on remote container
+        String jdbcUrl = SharedDerbyContainer.getJdbcUrl(dbName);
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement stmt = conn.createStatement()) {
+
+            try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM DATABASECHANGELOG")) {
+                assertTrue(rs.next());
+                assertTrue(rs.getInt(1) >= 2);
+            }
+        }
     }
 
     @Test
