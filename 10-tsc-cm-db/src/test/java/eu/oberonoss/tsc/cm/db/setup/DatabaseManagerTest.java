@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 class DatabaseManagerTest {
 
     private DatabaseManager databaseManager;
@@ -128,5 +129,63 @@ class DatabaseManagerTest {
     @Test
     void testShutdownDerbyEngine() {
         assertDoesNotThrow(DatabaseManager::shutdownDerbyEngine);
+    }
+
+    @Test
+    void testRemoteConfigurationInitializationAndShutdown() {
+        DatabaseConfig remoteConfig = DatabaseConfig.builder()
+                .host("localhost")
+                .port(1527)
+                .dbName("remote-test-db")
+                .create(true)
+                .build();
+
+        try (DatabaseManager manager = new DatabaseManager(remoteConfig)) {
+            assertThatThrownBy(manager::initialize)
+                    .isInstanceOf(DatabaseException.class)
+                    .hasMessageContaining("Failed to initialize Derby database");
+
+            assertThat(manager.isInitialized()).isFalse();
+            manager.shutdown();
+            assertThat(manager.isClosed()).isTrue();
+        }
+    }
+
+    @Test
+    void testNullDatabaseConfigDefaultsToDefault() {
+        try (DatabaseManager manager = new DatabaseManager(null, null)) {
+            assertThat(manager.getConfig()).isNotNull();
+            assertThat(manager.getConfig().getDbName()).isEqualTo(DatabaseConfig.DEFAULT_DB_NAME);
+        }
+    }
+
+    @Test
+    void testEmbeddedDatabaseWithoutDbDirectory() {
+        DatabaseConfig noDirConfig = DatabaseConfig.builder()
+                .dbName("nodir-test-" + System.nanoTime())
+                .dbDirectory(null)
+                .inMemory(true)
+                .build();
+
+        try (DatabaseManager manager = new DatabaseManager(noDirConfig)) {
+            manager.initialize();
+            assertThat(manager.isInitialized()).isTrue();
+            assertThat(manager.getDataSource()).isNotNull();
+        }
+    }
+
+    @Test
+    void testEmbeddedDatabaseWithoutDbDirectoryNonMemory(@org.junit.jupiter.api.io.TempDir java.nio.file.Path tempDir) {
+        String dbPath = tempDir.resolve("nodir-file-" + System.nanoTime()).toAbsolutePath().toString();
+        DatabaseConfig noDirConfig = DatabaseConfig.builder()
+                .dbName(dbPath)
+                .dbDirectory(null)
+                .inMemory(false)
+                .build();
+
+        try (DatabaseManager manager = new DatabaseManager(noDirConfig)) {
+            manager.initialize();
+            assertThat(manager.isInitialized()).isTrue();
+        }
     }
 }

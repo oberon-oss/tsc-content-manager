@@ -101,6 +101,16 @@ class LiquibaseMigrationCLITest {
     }
 
     @Test
+    void testExecutionWithRemoteHostAndPortFailsWithoutServer() {
+        LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
+        CommandLine cmd = new CommandLine(cli);
+
+        int exitCode = cmd.execute("-H", "localhost", "-P", "1527", "-n", "remote-test");
+
+        assertEquals(1, exitCode);
+    }
+
+    @Test
     void testHelpOption() {
         LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
         CommandLine cmd = new CommandLine(cli);

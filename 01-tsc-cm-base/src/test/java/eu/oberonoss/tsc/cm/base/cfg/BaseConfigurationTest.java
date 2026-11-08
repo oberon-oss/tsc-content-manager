@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import oshi.PlatformEnum;
 
 import java.io.File;
@@ -171,43 +172,9 @@ class BaseConfigurationTest {
     @Nested
     class SystemPropertiesAndEnvironmentOverrides {
 
-        @Test
-        void systemPropertyTscInstallationDirectoryOverride(@TempDir Path tempDir) {
-            String key = "tsc.installation.directory";
-            String original = System.getProperty(key);
-            try {
-                System.setProperty(key, tempDir.toString());
-                Path resolved = BaseConfiguration.resolveDefaultInstallationDirectory();
-                assertEquals(tempDir.toAbsolutePath().normalize(), resolved);
-            } finally {
-                if (original != null) {
-                    System.setProperty(key, original);
-                } else {
-                    System.clearProperty(key);
-                }
-            }
-        }
-
-        @Test
-        void systemPropertyTscInstallDirOverride(@TempDir Path tempDir) {
-            String key = "tsc.install.dir";
-            String original = System.getProperty(key);
-            try {
-                System.setProperty(key, tempDir.toString());
-                Path resolved = BaseConfiguration.resolveDefaultInstallationDirectory();
-                assertEquals(tempDir.toAbsolutePath().normalize(), resolved);
-            } finally {
-                if (original != null) {
-                    System.setProperty(key, original);
-                } else {
-                    System.clearProperty(key);
-                }
-            }
-        }
-
-        @Test
-        void systemPropertyTscHomeOverride(@TempDir Path tempDir) {
-            String key = "tsc.home";
+        @ParameterizedTest
+        @ValueSource(strings = {"tsc.installation.directory", "tsc.install.dir", "tsc.home"})
+        void systemPropertyTscInstallationDirectoryOverride(String key, @TempDir Path tempDir) {
             String original = System.getProperty(key);
             try {
                 System.setProperty(key, tempDir.toString());

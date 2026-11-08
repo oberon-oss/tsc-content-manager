@@ -135,7 +135,9 @@ public class JpaManager implements AutoCloseable {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(JdbcSettings.JAKARTA_JDBC_URL, config.getJdbcUrl());
-        properties.put(JdbcSettings.JAKARTA_JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+        properties.put(JdbcSettings.JAKARTA_JDBC_DRIVER, config.isRemote()
+                ? "org.apache.derby.jdbc.ClientDriver"
+                : "org.apache.derby.jdbc.EmbeddedDriver");
 
         try {
             EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, properties);

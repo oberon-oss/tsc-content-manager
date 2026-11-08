@@ -45,6 +45,14 @@
             <groupId>eu.oberon-oss.tsc</groupId>
             <artifactId>70-tsc-cm-gui</artifactId>
         </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>eu.oberon-oss.tsc</groupId>
+            <artifactId>10-tsc-cm-db</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

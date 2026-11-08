@@ -55,6 +55,18 @@ public class LiquibaseMigrationCLI implements Callable<Integer> {
     boolean inMemory;
 
     @Option(
+            names = {"--host", "-H"},
+            description = "Host name or IP address of the remote Derby Network Server"
+    )
+    String host;
+
+    @Option(
+            names = {"--port", "-P"},
+            description = "Port number of the remote Derby Network Server"
+    )
+    Integer port;
+
+    @Option(
             names = {"--contexts"},
             description = "Optional Liquibase contexts to filter changesets"
     )
@@ -111,10 +123,16 @@ public class LiquibaseMigrationCLI implements Callable<Integer> {
         if (dbDirectory != null) {
             configBuilder.dbDirectory(dbDirectory);
         }
+        if (host != null && !host.isBlank()) {
+            configBuilder.host(host);
+        }
+        if (port != null && port > 0) {
+            configBuilder.port(port);
+        }
 
         DatabaseConfig config = configBuilder.build();
-        LOGGER.info("Target database configuration: dbName={}, inMemory={}, dbDirectory={}",
-                config.getDbName(), config.isInMemory(), config.getDbDirectory());
+        LOGGER.info("Target database configuration: dbName={}, inMemory={}, host={}, port={}, dbDirectory={}",
+                config.getDbName(), config.isInMemory(), config.getHost(), config.getPort(), config.getDbDirectory());
         LOGGER.info("Using master changelog: {}", config.getChangelogPath());
 
         LiquibaseManager liquibaseManager = new LiquibaseManager();

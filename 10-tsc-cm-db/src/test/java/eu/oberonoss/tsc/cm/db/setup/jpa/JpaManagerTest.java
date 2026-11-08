@@ -184,4 +184,17 @@ class JpaManagerTest {
                 .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Failed to create EntityManagerFactory");
     }
+
+    @Test
+    void testCreateFromRemoteDatabaseConfig() {
+        DatabaseConfig remoteConfig = DatabaseConfig.builder()
+                .host("localhost")
+                .port(1527)
+                .dbName("remote-jpa-test")
+                .build();
+
+        assertThatThrownBy(() -> JpaManager.create(remoteConfig))
+                .isInstanceOf(DatabaseException.class)
+                .hasMessageContaining("Failed to create EntityManagerFactory");
+    }
 }

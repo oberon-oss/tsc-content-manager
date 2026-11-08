@@ -14,6 +14,7 @@ import java.sql.Statement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 class LiquibaseManagerTest {
 
     private String dbName;
@@ -87,6 +88,23 @@ class LiquibaseManagerTest {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getInt(1)).isGreaterThanOrEqualTo(2);
             }
+        }
+    }
+
+    @Test
+    void testHasPendingMigrations() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            // Before migrations run, pending migrations should be true
+            assertThat(liquibaseManager.hasPendingMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH)).isTrue();
+
+            // Run migrations
+            liquibaseManager.runMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH);
+
+            // After migrations run, pending migrations should be false
+            assertThat(liquibaseManager.hasPendingMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH)).isFalse();
+
+            // When an invalid changelog is passed, exception is caught and returns true
+            assertThat(liquibaseManager.hasPendingMigrations(connection, "non-existent-changelog.xml")).isTrue();
         }
     }
 

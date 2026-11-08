@@ -52,9 +52,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <sourceFileExcludes>
-                        <exclude>**/*Builder.java</exclude>
-                    </sourceFileExcludes>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
         </plugins>
@@ -62,6 +60,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- CVE overrides -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.28.0</version>
+                <scope>compile</scope>
+            </dependency>
+
             <!-- external dependencies -->
             <dependency>
                 <groupId>eu.oberon-oss.tools</groupId>
@@ -94,6 +100,11 @@
                 <version>${derby.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyclient</artifactId>
+                <version>${derby.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
                 <version>${liquibase.version}</version>
@@ -118,6 +129,13 @@
                 <groupId>eu.oberon-oss.tsc</groupId>
                 <artifactId>10-tsc-cm-db</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.oberon-oss.tsc</groupId>
+                <artifactId>10-tsc-cm-db</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>eu.oberon-oss.tsc</groupId>

@@ -111,6 +111,38 @@ class DatabaseConfigTest {
     }
 
     @Test
+    void testRemoteConfig() {
+        DatabaseConfig config = DatabaseConfig.createRemote("localhost", 1527, "remote-db");
+
+        assertThat(config.getHost()).isEqualTo("localhost");
+        assertThat(config.getPort()).isEqualTo(1527);
+        assertThat(config.getDbName()).isEqualTo("remote-db");
+        assertThat(config.isRemote()).isTrue();
+        assertThat(config.isInMemory()).isFalse();
+        assertThat(config.isCreate()).isTrue();
+        assertThat(config.getJdbcUrl()).isEqualTo("jdbc:derby://localhost:1527/remote-db;create=true");
+        assertThat(config.getShutdownUrl()).isEqualTo("jdbc:derby://localhost:1527/remote-db;shutdown=true");
+    }
+
+    @Test
+    void testIsRemoteDetection() {
+        DatabaseConfig remote = DatabaseConfig.builder().host("127.0.0.1").port(1527).build();
+        assertThat(remote.isRemote()).isTrue();
+
+        DatabaseConfig noPort = DatabaseConfig.builder().host("127.0.0.1").build();
+        assertThat(noPort.isRemote()).isFalse();
+
+        DatabaseConfig noHost = DatabaseConfig.builder().port(1527).build();
+        assertThat(noHost.isRemote()).isFalse();
+
+        DatabaseConfig blankHost = DatabaseConfig.builder().host(" ").port(1527).build();
+        assertThat(blankHost.isRemote()).isFalse();
+
+        DatabaseConfig zeroPort = DatabaseConfig.builder().host("127.0.0.1").port(0).build();
+        assertThat(zeroPort.isRemote()).isFalse();
+    }
+
+    @Test
     void testToStringAndToBuilder() {
         DatabaseConfig config = DatabaseConfig.createInMemory("test-db");
         DatabaseConfig modified = config.toBuilder().autoMigrate(false).build();
