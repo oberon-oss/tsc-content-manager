@@ -102,6 +102,9 @@ class LiquibaseManagerTest {
 
             // After migrations run, pending migrations should be false
             assertThat(liquibaseManager.hasPendingMigrations(connection, DatabaseConfig.DEFAULT_CHANGELOG_PATH)).isFalse();
+
+            // When an invalid changelog is passed, exception is caught and returns true
+            assertThat(liquibaseManager.hasPendingMigrations(connection, "non-existent-changelog.xml")).isTrue();
         }
     }
 
