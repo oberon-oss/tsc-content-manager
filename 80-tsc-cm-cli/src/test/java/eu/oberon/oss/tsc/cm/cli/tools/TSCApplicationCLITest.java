@@ -146,6 +146,7 @@ class TSCApplicationCLITest {
 
             @Override
             public void destroy() {
+                // Left intentionally blank
             }
 
             @Override
@@ -208,6 +209,7 @@ class TSCApplicationCLITest {
 
         @Override
         public void destroy() {
+            // Left intentionally blank
         }
 
         @Override
