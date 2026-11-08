@@ -36,7 +36,7 @@ public class DatabaseManager implements AutoCloseable {
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
         } catch (ClassNotFoundException e) {
-            log.debug("Derby ClientDriver not found on classpath");
+            log.debug("Derby ClientDriver not found on classpath", e);
         }
     }
 
