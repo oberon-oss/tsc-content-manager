@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 class DatabaseManagerTest {
 
     private DatabaseManager databaseManager;
