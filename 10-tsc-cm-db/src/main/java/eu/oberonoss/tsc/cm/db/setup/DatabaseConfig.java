@@ -13,6 +13,7 @@ import java.nio.file.Paths;
  * @author TigerLilly64
  * @since 1.0.0
  */
+@SuppressWarnings("JavadocDeclaration")
 @Getter
 @Builder(toBuilder = true)
 @ToString

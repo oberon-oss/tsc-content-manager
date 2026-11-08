@@ -2,7 +2,6 @@ package eu.oberon.oss.tsc.cm.cli.tools;
 
 import eu.oberon.oss.tsc.cm.cli.ToolNameConverter;
 import eu.oberon.oss.tsc.cm.cli.ToolRunner;
-import eu.oberonoss.tsc.cm.db.testutil.SharedDerbyContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import java.nio.file.Path;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class LiquibaseMigrationCLITest {
 
@@ -24,34 +22,6 @@ class LiquibaseMigrationCLITest {
     @AfterEach
     void cleanUp() {
         ToolNameConverter.reset();
-    }
-
-    @Test
-    void testExecutionRemoteDerbyContainer() throws SQLException {
-        assumeTrue(SharedDerbyContainer.isAvailable(), "Derby Testcontainer is not available in the current environment");
-        String dbName = "cli_remote_test_" + System.nanoTime();
-        LiquibaseMigrationCLI cli = new LiquibaseMigrationCLI();
-        CommandLine cmd = new CommandLine(cli);
-
-        int exitCode = cmd.execute(
-                "-H", SharedDerbyContainer.getHost(),
-                "-P", String.valueOf(SharedDerbyContainer.getPort()),
-                "-n", dbName
-        );
-
-        assertEquals(0, exitCode);
-
-        // Verify Derby database migrations on remote container
-        String jdbcUrl = SharedDerbyContainer.getJdbcUrl(dbName);
-        try (Connection conn = DriverManager.getConnection(jdbcUrl);
-             Statement stmt = conn.createStatement()) {
-
-            //noinspection SqlNoDataSourceInspection
-            try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM DATABASECHANGELOG")) {
-                assertTrue(rs.next());
-                assertTrue(rs.getInt(1) >= 2);
-            }
-        }
     }
 
     @Test

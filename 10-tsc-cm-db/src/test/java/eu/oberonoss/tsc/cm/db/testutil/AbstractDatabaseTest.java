@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Base test class providing a shared, containerized Derby database instance across tests and modules.
+ * Base test class providing a shared in-memory Derby database instance across tests and modules.
  *
  * @author TigerLilly64
  * @since 1.0.0
@@ -25,7 +25,11 @@ public abstract class AbstractDatabaseTest {
     @BeforeAll
     public static synchronized void initSharedDatabase() {
         if (sharedConfig == null) {
-            sharedConfig = SharedDerbyContainer.createSharedDatabaseConfig();
+            sharedConfig = DatabaseConfig.builder()
+                    .inMemory(true)
+                    .dbName("tsc_test_db")
+                    .autoMigrate(true)
+                    .build();
             sharedDatabaseManager = new DatabaseManager(sharedConfig);
             sharedDatabaseManager.initialize();
             sharedJpaManager = sharedDatabaseManager.createJpaManager();

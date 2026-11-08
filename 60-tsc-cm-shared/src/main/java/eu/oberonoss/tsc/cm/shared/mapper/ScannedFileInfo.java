@@ -16,6 +16,7 @@ import java.time.Instant;
  *
  * @since 1.0.0
  */
+@SuppressWarnings("JavadocDeclaration")
 @Builder(toBuilder = true)
 public record ScannedFileInfo(
         Long id,
